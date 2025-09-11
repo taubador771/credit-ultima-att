@@ -70,7 +70,7 @@ const Documentos = () => {
               Propostas e contratos relacionados ao projeto
             </p>
           </div>
-          <Button>
+          <Button onClick={() => alert("Abrindo editor de novo documento...")}>
             <Plus className="h-4 w-4 mr-2" />
             Novo Documento
           </Button>
@@ -103,11 +103,28 @@ const Documentos = () => {
                       {documento.status}
                     </span>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          // Simula visualização do documento
+                          alert(`Visualizando: ${documento.title}`);
+                        }}
+                      >
                         <Eye className="h-4 w-4 mr-2" />
                         Visualizar
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          // Simula download do documento
+                          const link = document.createElement('a');
+                          link.href = '#';
+                          link.download = `${documento.title.replace(/\s+/g, '_')}.pdf`;
+                          alert(`Download iniciado: ${documento.title}.pdf`);
+                        }}
+                      >
                         <Download className="h-4 w-4 mr-2" />
                         Download
                       </Button>
@@ -129,15 +146,27 @@ const Documentos = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => alert("Carregando modelo de proposta comercial...")}
+                >
                   <FileText className="h-4 w-4 mr-2" />
                   Modelo de Proposta
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => alert("Carregando modelo de contrato de prestação de serviços...")}
+                >
                   <FileText className="h-4 w-4 mr-2" />
                   Modelo de Contrato
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => alert("Carregando modelo de termo de confidencialidade...")}
+                >
                   <FileText className="h-4 w-4 mr-2" />
                   Modelo de Termo
                 </Button>
@@ -156,14 +185,33 @@ const Documentos = () => {
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium">Logotipo da Empresa</label>
-                  <Button variant="outline" className="w-full mt-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full mt-2"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          alert(`Upload do arquivo: ${file.name} (${(file.size / 1024).toFixed(1)}KB)`);
+                        }
+                      };
+                      input.click();
+                    }}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Fazer Upload
                   </Button>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Assinatura Digital</label>
-                  <Button variant="outline" className="w-full mt-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full mt-2"
+                    onClick={() => alert("Abrindo configurador de assinatura digital...")}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Configurar
                   </Button>

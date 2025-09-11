@@ -2,7 +2,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, FileText, Download, Calendar } from "lucide-react";
+import { BarChart3, FileText, Download, Calendar, Plus } from "lucide-react";
 
 interface FormData {
   nomeEmpresa: string;
@@ -83,6 +83,15 @@ const Relatorios = () => {
                     variant="outline" 
                     size="sm"
                     disabled={relatorio.status !== "Disponível"}
+                    onClick={() => {
+                      if (relatorio.status === "Disponível") {
+                        // Simula geração e download do relatório
+                        const link = document.createElement('a');
+                        link.href = '#';
+                        link.download = `${relatorio.title.replace(/\s+/g, '_')}.pdf`;
+                        alert(`Gerando relatório: ${relatorio.title}\nO download iniciará em breve...`);
+                      }
+                    }}
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Download
@@ -93,21 +102,46 @@ const Relatorios = () => {
           ))}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Histórico de Relatórios</CardTitle>
-            <CardDescription>
-              Acesse relatórios gerados anteriormente
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Nenhum histórico de relatórios encontrado</p>
-              <p className="text-sm">Configure os dados do simulador para gerar relatórios</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Geração Personalizada</CardTitle>
+              <CardDescription>
+                Crie relatórios customizados com IA
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button className="w-full" onClick={() => alert("Iniciando geração de relatório personalizado com IA...")}>
+                <Plus className="h-4 w-4 mr-2" />
+                Gerar Relatório com IA
+              </Button>
+              <div className="text-sm text-muted-foreground">
+                <p>• Análise automática dos dados</p>
+                <p>• Recomendações personalizadas</p>
+                <p>• Geração em PDF profissional</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Histórico Privado</CardTitle>
+              <CardDescription>
+                Relatórios gerados (acesso restrito)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-4 text-muted-foreground">
+                <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Histórico protegido</p>
+                <p className="text-xs">Entre com credenciais para acessar</p>
+                <Button variant="outline" size="sm" className="mt-2" onClick={() => alert("Funcionalidade disponível após autenticação de usuário")}>
+                  Acessar Histórico
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   );

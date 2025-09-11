@@ -27,36 +27,72 @@ const Ajuda = () => {
   const faqItems = [
     {
       pergunta: "Como funciona o cálculo de economia tributária?",
-      resposta: "O cálculo considera o percentual de crédito utilizado aplicado sobre o valor mensal, subtraindo os honorários e mantendo o pagamento direto da diferença."
+      resposta: "O sistema calcula a economia baseado nos créditos de PIS/COFINS e outros tributos. Você paga apenas 5% do valor dos tributos em dinheiro + honorários sobre o crédito utilizado. A diferença é compensada através dos créditos acumulados."
     },
     {
       pergunta: "Qual é o prazo para recuperação dos créditos?",
-      resposta: "O prazo varia conforme o tipo de tributo e pode levar de 30 a 180 dias para aprovação pelos órgãos competentes."
+      resposta: "O prazo varia conforme o tipo de tributo: PIS/COFINS (30-60 dias), IRPJ/CSLL (60-120 dias). Após aprovação pela Receita Federal, os créditos podem ser utilizados para compensação."
     },
     {
       pergunta: "Como alterar os parâmetros de simulação?",
-      resposta: "Acesse o menu 'Configurações' → 'Simulador' na sidebar para ajustar todos os parâmetros de cálculo."
+      resposta: "Acesse 'Configurações' → 'Simulador' na sidebar. Configure: nome da empresa, tributos pagos, valor mensal, período da simulação e percentuais de crédito e honorários."
     },
     {
       pergunta: "É possível gerar relatórios personalizados?",
-      resposta: "Sim, na seção 'Relatórios' você pode gerar diferentes tipos de análises baseadas nos seus dados configurados."
+      resposta: "Sim, na seção 'Relatórios' você pode gerar: Relatório Executivo (resumo completo), Análise Detalhada (breakdown mensal) e Projeção Anual (estimativas futuras)."
+    },
+    {
+      pergunta: "Como funciona a seção de Documentos?",
+      resposta: "A seção permite gerar, visualizar e gerenciar documentos essenciais: propostas comerciais, contratos de prestação de serviços e termos de confidencialidade. Use os modelos pré-configurados para agilizar o processo."
+    },
+    {
+      pergunta: "Posso fazer upload de documentos personalizados?",
+      resposta: "Sim, você pode fazer upload de logotipos, assinaturas digitais e outros documentos necessários através da seção 'Configurações' dentro de Documentos."
+    },
+    {
+      pergunta: "Como configurar a integração com IA?",
+      resposta: "Acesse 'Configurações' → 'Integração IA' para conectar com serviços de inteligência artificial que automatizam a geração de relatórios personalizados em PDF para cada cliente."
+    },
+    {
+      pergunta: "Os dados ficam seguros no sistema?",
+      resposta: "Sim, todos os dados são protegidos com criptografia e seguem as melhores práticas de segurança. Apenas usuários autorizados podem acessar as configurações administrativas."
     }
   ];
 
   const tutoriais = [
     {
       titulo: "Primeiros Passos",
-      descricao: "Configure sua primeira simulação",
+      descricao: "Configure sua primeira simulação de economia tributária",
       duracao: "5 min"
     },
     {
       titulo: "Interpretando Resultados",
-      descricao: "Entenda os cálculos e gráficos",
+      descricao: "Entenda os cálculos, gráficos e projeções do dashboard",
       duracao: "8 min"
     },
     {
       titulo: "Gerando Relatórios",
-      descricao: "Crie documentos profissionais",
+      descricao: "Crie relatórios executivos, análises detalhadas e projeções",
+      duracao: "6 min"
+    },
+    {
+      titulo: "Gerenciando Documentos",
+      descricao: "Como criar, editar e gerenciar propostas e contratos",
+      duracao: "7 min"
+    },
+    {
+      titulo: "Configuração de Upload",
+      descricao: "Configure logotipos, assinaturas e documentos personalizados",
+      duracao: "4 min"
+    },
+    {
+      titulo: "Integração com IA",
+      descricao: "Configure a IA para geração automática de relatórios em PDF",
+      duracao: "10 min"
+    },
+    {
+      titulo: "Configurações Avançadas",
+      descricao: "Ajuste percentuais, períodos e parâmetros personalizados",
       duracao: "6 min"
     }
   ];

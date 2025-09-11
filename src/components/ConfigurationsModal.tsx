@@ -92,6 +92,10 @@ export function ConfigurationsModal({ formData, onDataChange, trigger }: Configu
   };
 
   const handleInputChange = (field: keyof FormData, value: string | number | boolean) => {
+    // Para campos numéricos, mantém o valor anterior se a conversão falhar
+    if (typeof value === 'number' && isNaN(value)) {
+      return;
+    }
     setLocalData({ ...localData, [field]: value });
   };
 
@@ -195,7 +199,12 @@ export function ConfigurationsModal({ formData, onDataChange, trigger }: Configu
                       type="number"
                       placeholder="100000"
                       value={localData.valorMensal}
-                      onChange={(e) => handleInputChange("valorMensal", parseFloat(e.target.value) || 0)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (!isNaN(value) && value > 0) {
+                          handleInputChange("valorMensal", value);
+                        }
+                      }}
                     />
                     <p className="text-xs text-muted-foreground">
                       {formatCurrency(localData.valorMensal)}
@@ -233,7 +242,12 @@ export function ConfigurationsModal({ formData, onDataChange, trigger }: Configu
                       min="0"
                       max="95"
                       value={localData.percentualCredito}
-                      onChange={(e) => handleInputChange("percentualCredito", parseFloat(e.target.value) || 95)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (!isNaN(value) && value >= 0 && value <= 95) {
+                          handleInputChange("percentualCredito", value);
+                        }
+                      }}
                     />
                   </div>
                   
@@ -245,7 +259,12 @@ export function ConfigurationsModal({ formData, onDataChange, trigger }: Configu
                       min="0"
                       max="100"
                       value={localData.percentualHonorarios}
-                      onChange={(e) => handleInputChange("percentualHonorarios", parseFloat(e.target.value) || 70)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (!isNaN(value) && value >= 0 && value <= 100) {
+                          handleInputChange("percentualHonorarios", value);
+                        }
+                      }}
                     />
                   </div>
                 </div>

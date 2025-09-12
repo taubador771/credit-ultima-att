@@ -130,7 +130,7 @@ const adicionarRodape = (pdf: jsPDF, config: ConfiguracaoTimbrado, numeroRelator
   
   // Disclaimer
   pdf.setFontSize(6);
-  pdf.text("Este documento foi gerado automaticamente pelo sistema Unique Créditos Tributários", 15, pageHeight - 7);
+  pdf.text("Este documento foi gerado automaticamente pelo sistema Unique Assessoria Empresarial", 15, pageHeight - 7);
 };
 
 // Função para adicionar marca d'água com timbrado

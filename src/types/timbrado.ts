@@ -33,7 +33,7 @@ export interface ConfiguracaoTimbrado {
 }
 
 export const configuracaoTimbradoPadrao: ConfiguracaoTimbrado = {
-  razaoSocial: "Unique Créditos Tributários LTDA",
+  razaoSocial: "Unique Assessoria Empresarial",
   cnpj: "00.000.000/0001-00",
   endereco: {
     logradouro: "Rua das Empresas",
@@ -44,8 +44,8 @@ export const configuracaoTimbradoPadrao: ConfiguracaoTimbrado = {
   },
   contato: {
     telefone: "(11) 9999-9999",
-    email: "contato@uniquecreditos.com.br",
-    website: "www.uniquecreditos.com.br",
+    email: "contato@uniqueassessoria.com.br",
+    website: "www.uniqueassessoria.com.br",
   },
   tema: {
     corPrimaria: "#3b82f6",

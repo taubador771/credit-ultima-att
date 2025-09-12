@@ -140,12 +140,8 @@ const adicionarMarcaDagua = (pdf: jsPDF, config: ConfiguracaoTimbrado) => {
   const pageWidth = pdf.internal.pageSize.width;
   const pageHeight = pdf.internal.pageSize.height;
   
-  // Salvar estado atual
-  const currentAlpha = pdf.internal.getGraphicsState();
-  
-  // Configurar transparência
-  pdf.setGState(new pdf.GState({ opacity: 0.08 }));
-  
+  // Transparência via GState não é suportada pelos typings aqui;
+  // usamos cor clara para simular marca d'água.
   if (config.logo) {
     // Usar logo como marca d'água se disponível
     try {
@@ -154,25 +150,22 @@ const adicionarMarcaDagua = (pdf: jsPDF, config: ConfiguracaoTimbrado) => {
       const y = (pageHeight - logoSize) / 2;
       pdf.addImage(config.logo.base64, 'PNG', x, y, logoSize, logoSize);
     } catch (error) {
-      console.warn('Erro ao adicionar marca d\'água com logo:', error);
+      console.warn("Erro ao adicionar marca d'água com logo:", error);
     }
   } else {
     // Texto da marca d'água
     pdf.setFont("Roboto", "bold");
     pdf.setFontSize(45);
-    pdf.setTextColor(100, 100, 100);
+    pdf.setTextColor(200, 200, 200);
     
-    // Rotacionar e posicionar o texto
-    const angle = -45 * Math.PI / 180;
+    // Rotacionar e posicionar o texto (graus)
+    const angle = -45;
     const nomeEmpresa = config.razaoSocial.split(' ').slice(0, 2).join(' ').toUpperCase();
     pdf.text(nomeEmpresa, pageWidth / 2, pageHeight / 2, {
-      angle: angle,
+      angle,
       align: 'center'
     });
   }
-  
-  // Restaurar estado original
-  pdf.setGState(currentAlpha);
 };
 
 const criarGraficoPizza = (dados: { label: string; valor: number; cor: string }[]): HTMLCanvasElement => {
@@ -216,6 +209,62 @@ const criarGraficoPizza = (dados: { label: string; valor: number; cor: string }[
   return canvas;
 };
 
+const criarGraficoBarras = (dados: { label: string; valor: number }[]): HTMLCanvasElement => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 600;
+  canvas.height = 300;
+  const ctx = canvas.getContext('2d')!;
+
+  // Background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const margin = { top: 30, right: 20, bottom: 50, left: 40 };
+  const chartWidth = canvas.width - margin.left - margin.right;
+  const chartHeight = canvas.height - margin.top - margin.bottom;
+  const maxValor = Math.max(...dados.map(d => d.valor), 1);
+  const gap = 10;
+  const barWidth = Math.max(10, chartWidth / dados.length - gap);
+  const xStart = margin.left;
+  const yStart = canvas.height - margin.bottom;
+
+  // Eixos
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.beginPath();
+  ctx.moveTo(xStart, margin.top);
+  ctx.lineTo(xStart, yStart);
+  ctx.lineTo(canvas.width - margin.right, yStart);
+  ctx.stroke();
+
+  // Título
+  ctx.fillStyle = '#1F2937';
+  ctx.font = 'bold 16px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Projeção de Economia', canvas.width / 2, 20);
+
+  // Barras
+  dados.forEach((d, i) => {
+    const x = xStart + i * (barWidth + gap) + 5;
+    const h = (d.valor / maxValor) * (chartHeight - 10);
+    const y = yStart - h;
+
+    ctx.fillStyle = '#3b82f6';
+    ctx.fillRect(x, y, barWidth, h);
+
+    // Rótulos
+    ctx.fillStyle = '#374151';
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(d.label, x + barWidth / 2, yStart + 15);
+
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 10px Arial';
+    ctx.fillText(`${Math.round(d.valor).toLocaleString('pt-BR')}`, x + barWidth / 2, y - 5);
+  });
+
+  return canvas;
+};
+
 export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoRelatorio: string): Promise<void> => {
   try {
     const pdf = new jsPDF();
@@ -230,19 +279,6 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     adicionarCabecalho(pdf, config, numeroRelatorio);
     adicionarMarcaDagua(pdf, config);
     
-    const economiaCredito = formData.valorMensal * (formData.percentualCredito / 100);
-    const honorarios = economiaCredito * (formData.percentualHonorarios / 100);
-    const economiaMensal = economiaCredito - honorarios;
-    const economiaTotal = economiaMensal * formData.periodo;
-    
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    let yPosition = 55;
-    const margin = 15;
-    
-    // Título principal
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(22);
-    pdf.text('ANÁLISE DE ECONOMIA TRIBUTÁRIA', pageWidth / 2, 20, { align: 'center' });
     
     // ... rest of PDF content generation would continue here
 

@@ -266,20 +266,20 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 space-y-2 text-sm text-muted-foreground">
-                  <p><strong>OpenAI:</strong></p>
+                  <p><strong>🟢 Google (Recomendado - Gratuito):</strong></p>
+                  <p>1. Acesse aistudio.google.com</p>
+                  <p>2. Clique "Get API Key" → "Create API Key"</p>
+                  <p>3. Copie a chave (começa com "AIza")</p>
+                  
+                  <p className="pt-2"><strong>🟡 OpenAI (Pago):</strong></p>
                   <p>1. Acesse platform.openai.com</p>
-                  <p>2. Clique em "Create new secret key"</p>
-                  <p>3. Copie a chave que começa com "sk-"</p>
+                  <p>2. API Keys → "Create new secret key"</p>
+                  <p>3. Copie a chave (começa com "sk-")</p>
                   
-                  <p className="pt-2"><strong>Anthropic:</strong></p>
+                  <p className="pt-2"><strong>🟠 Anthropic (Pago):</strong></p>
                   <p>1. Acesse console.anthropic.com</p>
-                  <p>2. Vá em "API Keys" → "Create Key"</p>
-                  <p>3. Copie a chave que começa com "sk-ant-"</p>
-                  
-                  <p className="pt-2"><strong>Google:</strong></p>
-                  <p>1. Acesse Google Cloud Console</p>
-                  <p>2. Ative a Gemini API</p>
-                  <p>3. Crie credenciais de API</p>
+                  <p>2. API Keys → "Create Key"</p>
+                  <p>3. Copie a chave (começa com "sk-ant-")</p>
                 </CardContent>
               </Card>
 

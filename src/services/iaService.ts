@@ -112,7 +112,20 @@ export class IAService {
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API erro: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      let errorMessage = `OpenAI API erro ${response.status}`;
+      
+      if (response.status === 429) {
+        errorMessage = "Limite de requisições OpenAI atingido. Aguarde alguns minutos ou use um modelo gratuito (Gemini).";
+      } else if (response.status === 401) {
+        errorMessage = "Chave de API OpenAI inválida. Verifique se a chave está correta.";
+      } else if (response.status === 404) {
+        errorMessage = `Modelo '${modelo}' não encontrado. Verifique se você tem acesso a este modelo.`;
+      } else if (errorData.error?.message) {
+        errorMessage += `: ${errorData.error.message}`;
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -142,7 +155,20 @@ export class IAService {
     });
 
     if (!response.ok) {
-      throw new Error(`Anthropic API erro: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      let errorMessage = `Anthropic API erro ${response.status}`;
+      
+      if (response.status === 429) {
+        errorMessage = "Limite de requisições Anthropic atingido. Aguarde alguns minutos.";
+      } else if (response.status === 401) {
+        errorMessage = "Chave de API Anthropic inválida. Verifique se a chave está correta.";
+      } else if (response.status === 404) {
+        errorMessage = `Modelo '${modelo}' não encontrado no Anthropic.`;
+      } else if (errorData.error?.message) {
+        errorMessage += `: ${errorData.error.message}`;
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -191,7 +217,19 @@ export class IAService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Google API erro: ${response.status} - ${errorData.error?.message || 'Erro desconhecido'}`);
+      let errorMessage = `Google API erro ${response.status}`;
+      
+      if (response.status === 429) {
+        errorMessage = "Limite de requisições Google atingido. Aguarde alguns minutos.";
+      } else if (response.status === 401 || response.status === 403) {
+        errorMessage = "Chave de API Google inválida ou sem permissões. Verifique se a Gemini API está ativada.";
+      } else if (response.status === 404) {
+        errorMessage = `Modelo '${modelo}' não encontrado no Google. Experimente 'gemini-1.5-flash'.`;
+      } else if (errorData.error?.message) {
+        errorMessage += `: ${errorData.error.message}`;
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();

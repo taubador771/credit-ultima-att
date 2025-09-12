@@ -139,8 +139,16 @@ export class IAService {
   }
 
   private async chamarGoogle(prompt: string, apiKey: string, modelo: string, temperatura: number, promptSistema: string): Promise<string> {
-    // Implementação simplificada para Google Gemini
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${apiKey}`, {
+    // Determina o endpoint baseado no modelo
+    const isGemini2 = modelo.includes('gemini-2');
+    const baseUrl = isGemini2 
+      ? 'https://generativelanguage.googleapis.com/v1beta/models'
+      : 'https://generativelanguage.googleapis.com/v1beta/models';
+    
+    // Formata o modelo para a API do Google
+    const modelName = modelo.startsWith('models/') ? modelo : `models/${modelo}`;
+    
+    const response = await fetch(`${baseUrl}/${modelName}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -148,21 +156,39 @@ export class IAService {
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `${promptSistema}\n\n${prompt}`
+            text: `${promptSistema || 'Você é um especialista em análise financeira brasileira.'}\n\n${prompt}`
           }]
         }],
         generationConfig: {
           temperature: temperatura,
-          maxOutputTokens: 2000,
-        }
+          maxOutputTokens: 4000,
+          topP: 0.95,
+          topK: 40
+        },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH", 
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          }
+        ]
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`Google API erro: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Google API erro: ${response.status} - ${errorData.error?.message || 'Erro desconhecido'}`);
     }
 
     const data = await response.json();
+    
+    if (!data.candidates || data.candidates.length === 0) {
+      throw new Error('Nenhuma resposta gerada pela API do Google');
+    }
+    
     return data.candidates[0].content.parts[0].text;
   }
 

@@ -30,28 +30,33 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
   const [open, setOpen] = useState(false);
   const [config, setConfig] = useState<IAConfig>(currentConfig || {
     habilitado: false,
-    provider: "openai",
+    provider: "google",
     apiKey: "",
-    modelo: "gpt-4o",
+    modelo: "gemini-2.0-flash-exp",
     temperatura: 0.7,
     promptSistema: "Você é um especialista em análise financeira brasileira. Analise os dados e forneça insights sobre tendências e oportunidades de otimização tributária."
   });
+  const [modeloCustomizado, setModeloCustomizado] = useState("");
   
   const [testando, setTestando] = useState(false);
 
   const modelos = {
     openai: [
-      { value: "gpt-4o", label: "GPT-4o (mais preciso)" },
-      { value: "gpt-4o-mini", label: "GPT-4o mini (mais rápido)" },
-      { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" }
+      { value: "gpt-4o-mini", label: "GPT-4o Mini (Gratuito)" },
+      { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo (Gratuito)" },
+      { value: "gpt-4o", label: "GPT-4o" },
+      { value: "gpt-4", label: "GPT-4" }
     ],
     anthropic: [
-      { value: "claude-3-5-sonnet-20241022", label: "Claude-3.5 Sonnet (melhor texto)" },
-      { value: "claude-3-5-haiku-20241022", label: "Claude-3.5 Haiku (rápido)" }
+      { value: "claude-3-haiku-20240307", label: "Claude 3 Haiku (Mais Barato)" },
+      { value: "claude-3-5-sonnet-20241022", label: "Claude-3.5 Sonnet" },
+      { value: "claude-3-5-haiku-20241022", label: "Claude-3.5 Haiku" }
     ],
     google: [
-      { value: "gemini-pro", label: "Gemini Pro" },
-      { value: "gemini-pro-vision", label: "Gemini Pro Vision" }
+      { value: "gemini-2.0-flash-exp", label: "Gemini 2.0 Flash Experimental (Gratuito)" },
+      { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash (Gratuito)" },
+      { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
+      { value: "gemini-pro", label: "Gemini Pro" }
     ]
   };
 
@@ -177,8 +182,15 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
               <div className="space-y-2">
                 <Label>Modelo</Label>
                 <Select
-                  value={config.modelo}
-                  onValueChange={(value) => setConfig({...config, modelo: value})}
+                  value={config.modelo === modeloCustomizado && modeloCustomizado ? "custom" : config.modelo}
+                  onValueChange={(value) => {
+                    if (value === "custom") {
+                      setConfig({...config, modelo: modeloCustomizado || ""});
+                    } else {
+                      setConfig({...config, modelo: value});
+                      setModeloCustomizado("");
+                    }
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -189,8 +201,25 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
                         {modelo.label}
                       </SelectItem>
                     ))}
+                    <SelectItem value="custom">🔧 Modelo Personalizado</SelectItem>
                   </SelectContent>
                 </Select>
+                
+                {(config.modelo === "custom" || (modeloCustomizado && config.modelo === modeloCustomizado)) && (
+                  <div className="mt-2">
+                    <Input
+                      placeholder="Digite o nome exato do modelo (ex: gemini-2.0-flash-exp)"
+                      value={modeloCustomizado}
+                      onChange={(e) => {
+                        setModeloCustomizado(e.target.value);
+                        setConfig({...config, modelo: e.target.value});
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Certifique-se de usar o nome exato do modelo conforme a documentação da API
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Temperatura */}
@@ -254,15 +283,16 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
               {/* Configuração Recomendada */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-green-600">✅ Configuração Recomendada:</CardTitle>
+                  <CardTitle className="text-sm text-green-600">✅ Modelos Gratuitos Recomendados:</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 space-y-1 text-sm text-muted-foreground">
-                  <p>Para análise financeira:</p>
-                  <p>• OpenAI GPT-4o (mais preciso)</p>
-                  <p>• Temperatura: 0.3-0.5 (consistente)</p>
-                  <p>• Claude-3.5 Sonnet (melhor texto)</p>
-                  <p>• Temperatura: 0.7-0.9 (criativo)</p>
-                  <p>• Modelo: claude-3-5-sonnet-20241022</p>
+                  <p><strong>🔥 Melhor custo-benefício:</strong></p>
+                  <p>• Gemini 2.0 Flash Experimental (Gratuito)</p>
+                  <p>• GPT-4o Mini (Gratuito OpenAI)</p>
+                  <p>• Claude 3 Haiku (Mais barato Anthropic)</p>
+                  <p className="pt-2"><strong>Para análise financeira:</strong></p>
+                  <p>• Temperatura: 0.3-0.7 (consistente)</p>
+                  <p>• Use prompt sistema específico para melhores resultados</p>
                 </CardContent>
               </Card>
 

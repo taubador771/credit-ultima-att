@@ -55,7 +55,7 @@ const Documentos = () => {
     },
     {
       title: "Termo de Cessão de Direitos",
-      description: "Termo para cessão de créditos tributários",
+      description: "Termo de Cessão Modelo",
       icon: FileText,
       arquivo: "termo-cessao-direitos.docx"
     },

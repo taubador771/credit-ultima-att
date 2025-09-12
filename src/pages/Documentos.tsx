@@ -49,7 +49,7 @@ const Documentos = () => {
   const modelosContratos = [
     {
       title: "Contrato de Prestação de Serviços",
-      description: "Contrato padrão para serviços tributários",
+      description: "Minuta Contratual Modelo",
       icon: ScrollText,
       arquivo: "contrato-prestacao-servicos.docx"
     },

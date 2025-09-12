@@ -176,69 +176,74 @@ export class IAService {
   }
 
   private async chamarGoogle(prompt: string, apiKey: string, modelo: string, temperatura: number, promptSistema: string): Promise<string> {
-    // Determina o endpoint baseado no modelo
-    const isGemini2 = modelo.includes('gemini-2');
-    const baseUrl = isGemini2 
-      ? 'https://generativelanguage.googleapis.com/v1beta/models'
-      : 'https://generativelanguage.googleapis.com/v1beta/models';
-    
-    // Formata o modelo para a API do Google
-    const modelName = modelo.startsWith('models/') ? modelo : `models/${modelo}`;
-    
-    const response = await fetch(`${baseUrl}/${modelName}:generateContent?key=${apiKey}`, {
+    // Endpoint único para Gemini
+    const baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+    // Normaliza o nome do modelo para evitar "models/models/..."
+    const normalizedModel = modelo.replace(/^models\//, '');
+
+    const response = await fetch(`${baseUrl}/${normalizedModel}:generateContent`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey,
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `${promptSistema || 'Você é um especialista em análise financeira brasileira.'}\n\n${prompt}`
-          }]
-        }],
+        contents: [
+          {
+            parts: [
+              {
+                text: `${promptSistema || 'Você é um especialista em análise financeira brasileira.'}\n\n${prompt}`,
+              },
+            ],
+          },
+        ],
         generationConfig: {
           temperature: temperatura,
           maxOutputTokens: 4000,
           topP: 0.95,
-          topK: 40
+          topK: 40,
         },
         safetySettings: [
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH", 
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          }
-        ]
+          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        ],
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = await response.json().catch(() => ({} as any));
       let errorMessage = `Google API erro ${response.status}`;
-      
+
       if (response.status === 429) {
-        errorMessage = "Limite de requisições Google atingido. Aguarde alguns minutos.";
+        errorMessage = 'Limite de requisições Google atingido. Aguarde alguns minutos.';
       } else if (response.status === 401 || response.status === 403) {
-        errorMessage = "Chave de API Google inválida ou sem permissões. Verifique se a Gemini API está ativada.";
+        errorMessage = 'Chave de API Google inválida ou sem permissões. Verifique se a Gemini API está ativada.';
       } else if (response.status === 404) {
-        errorMessage = `Modelo '${modelo}' não encontrado no Google. Experimente 'gemini-1.5-flash'.`;
-      } else if (errorData.error?.message) {
-        errorMessage += `: ${errorData.error.message}`;
+        errorMessage = `Modelo '${normalizedModel}' não encontrado no Google. Experimente 'gemini-1.5-flash'.`;
+      } else if ((errorData as any).error?.message) {
+        errorMessage += `: ${(errorData as any).error.message}`;
       }
-      
+
       throw new Error(errorMessage);
     }
 
     const data = await response.json();
-    
+
     if (!data.candidates || data.candidates.length === 0) {
       throw new Error('Nenhuma resposta gerada pela API do Google');
     }
-    
-    return data.candidates[0].content.parts[0].text;
+
+    // Extrai o texto considerando possíveis formatos
+    const candidate = data.candidates[0];
+    let text = '';
+    if (candidate?.content?.parts) {
+      text = candidate.content.parts.map((p: any) => p.text || '').join('');
+    } else if (candidate?.output_text) {
+      text = candidate.output_text;
+    }
+
+    return text || 'Sem conteúdo na resposta da API do Google.';
   }
 
   public async gerarRelatorioExecutivo(formData: FormData): Promise<RelatorioIA> {

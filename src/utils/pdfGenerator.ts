@@ -142,30 +142,16 @@ const adicionarMarcaDagua = (pdf: jsPDF, config: ConfiguracaoTimbrado) => {
   
   // Transparência via GState não é suportada pelos typings aqui;
   // usamos cor clara para simular marca d'água.
-  if (config.logo) {
-    // Usar logo como marca d'água se disponível
-    try {
-      const logoSize = 80;
-      const x = (pageWidth - logoSize) / 2;
-      const y = (pageHeight - logoSize) / 2;
-      pdf.addImage(config.logo.base64, 'PNG', x, y, logoSize, logoSize);
-    } catch (error) {
-      console.warn("Erro ao adicionar marca d'água com logo:", error);
-    }
-  } else {
-    // Texto da marca d'água
-    pdf.setFont("Roboto", "bold");
-    pdf.setFontSize(45);
-    pdf.setTextColor(200, 200, 200);
-    
-    // Rotacionar e posicionar o texto (graus)
-    const angle = -45;
-    const nomeEmpresa = config.razaoSocial.split(' ').slice(0, 2).join(' ').toUpperCase();
-    pdf.text(nomeEmpresa, pageWidth / 2, pageHeight / 2, {
-      angle,
-      align: 'center'
-    });
-  }
+  // Marca d'água leve com texto para evitar sobreposição de logos
+  pdf.setFont("Roboto", "bold");
+  pdf.setFontSize(42);
+  pdf.setTextColor(210, 210, 210);
+  const angle = -45;
+  const nomeEmpresa = config.razaoSocial.split(' ').slice(0, 2).join(' ').toUpperCase();
+  pdf.text(nomeEmpresa, pageWidth / 2, pageHeight / 2, {
+    angle,
+    align: 'center'
+  });
 };
 
 const criarGraficoPizza = (dados: { label: string; valor: number; cor: string }[]): HTMLCanvasElement => {
@@ -296,11 +282,11 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     let yPosition = margin;
 
     // Cabeçalho com dados da empresa configurada
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(22);
-    pdf.text('ANÁLISE DE ECONOMIA TRIBUTÁRIA', pageWidth / 2, 20, { align: 'center' });
-    pdf.setFontSize(16);
-    pdf.text(`${formData.nomeEmpresa || config.razaoSocial}`, pageWidth / 2, 35, { align: 'center' });
+    // Título principal abaixo do cabeçalho
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(18);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('ANÁLISE DE ECONOMIA TRIBUTÁRIA', margin, 55);
 
     yPosition = 60;
 

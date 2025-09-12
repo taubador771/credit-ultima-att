@@ -16,6 +16,37 @@ interface FormData {
   percentualHonorarios: number;
 }
 
+// Fontes Unicode para jsPDF
+let fontesCarregadas = false;
+
+const carregarFontesPDF = async (pdf: jsPDF) => {
+  if (fontesCarregadas) {
+    try { pdf.setFont('Roboto', 'normal'); } catch {}
+    return;
+  }
+  try {
+    const [regularRes, boldRes] = await Promise.all([
+      fetch('/fonts/Roboto-Regular.base64.txt'),
+      fetch('/fonts/Roboto-Bold.base64.txt'),
+    ]);
+
+    const [regularB64, boldB64] = await Promise.all([
+      regularRes.text(),
+      boldRes.text(),
+    ]);
+
+    pdf.addFileToVFS('Roboto-Regular.ttf', regularB64.trim());
+    pdf.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+    pdf.addFileToVFS('Roboto-Bold.ttf', boldB64.trim());
+    pdf.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+
+    pdf.setFont('Roboto', 'normal');
+    fontesCarregadas = true;
+  } catch (e) {
+    console.warn('Falha ao carregar fontes para PDF. Continuando com fonte padrão.', e);
+  }
+};
+
 // Função para criar gráfico de pizza (donut chart) em canvas
 const criarGraficoPizza = (dados: { label: string; valor: number; cor: string }[]): HTMLCanvasElement => {
   const canvas = document.createElement('canvas');
@@ -154,6 +185,7 @@ const criarGraficoBarras = (dados: { label: string; valor: number }[]): HTMLCanv
 export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoRelatorio: string): Promise<void> => {
   try {
     const pdf = new jsPDF();
+    await carregarFontesPDF(pdf);
     
     // Calcula métricas básicas
     const economiaCredito = formData.valorMensal * (formData.percentualCredito / 100);
@@ -174,7 +206,7 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(22);
-    pdf.text('💰 ANÁLISE DE ECONOMIA TRIBUTÁRIA', pageWidth / 2, 20, { align: 'center' });
+    pdf.text('ANÁLISE DE ECONOMIA TRIBUTÁRIA', pageWidth / 2, 20, { align: 'center' });
     pdf.setFontSize(16);
     pdf.text(`${formData.nomeEmpresa || "Sua Empresa"}`, pageWidth / 2, 35, { align: 'center' });
 
@@ -202,22 +234,22 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     const kpiHeight = 30;
     
     criarKPIBox(margin, yPosition, kpiWidth, kpiHeight, 
-      '📈 Economia Mensal', 
+      'Economia Mensal', 
       `R$ ${economiaMensal.toLocaleString('pt-BR')}`, 
       [16, 185, 129]);
     
     criarKPIBox(margin + kpiWidth + 5, yPosition, kpiWidth, kpiHeight, 
-      '💸 Economia Total', 
+      'Economia Total', 
       `R$ ${economiaTotal.toLocaleString('pt-BR')}`, 
       [59, 130, 246]);
     
     criarKPIBox(margin + (kpiWidth + 5) * 2, yPosition, kpiWidth, kpiHeight, 
-      '⚡ % Economia', 
+      '% Economia', 
       `${((economiaMensal / formData.valorMensal) * 100).toFixed(1)}%`, 
       [245, 158, 11]);
     
     criarKPIBox(margin + (kpiWidth + 5) * 3, yPosition, kpiWidth, kpiHeight, 
-      '🎯 ROI Anual', 
+      'ROI Anual', 
       `${((economiaTotal * 12 / formData.periodo / honorarios) * 100).toFixed(0)}%`, 
       [168, 85, 247]);
 
@@ -227,7 +259,7 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     pdf.setTextColor(0, 0, 0);
     pdf.setFontSize(16);
     pdf.setFont(undefined, 'bold');
-    pdf.text('🚀 SEU POTENCIAL DE ECONOMIA', margin, yPosition);
+    pdf.text('SEU POTENCIAL DE ECONOMIA', margin, yPosition);
     yPosition += 15;
 
     // Box comparativo visual
@@ -273,7 +305,7 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     pdf.setTextColor(0, 0, 0);
     pdf.setFontSize(12);
     pdf.setFont(undefined, 'bold');
-    pdf.text('✨ Por que escolher a Unique?', margin + 110, yPosition + 10);
+    pdf.text('Por que escolher a Unique?', margin + 110, yPosition + 10);
     
     pdf.setFontSize(9);
     pdf.setFont(undefined, 'normal');
@@ -300,7 +332,7 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
 
     pdf.setFontSize(16);
     pdf.setFont(undefined, 'bold');
-    pdf.text('📊 PROJEÇÃO DE CRESCIMENTO DA ECONOMIA', margin, yPosition);
+    pdf.text('PROJEÇÃO DE CRESCIMENTO DA ECONOMIA', margin, yPosition);
     yPosition += 15;
 
     // Criar gráfico de barras temporais

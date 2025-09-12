@@ -2,7 +2,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Eye, Plus } from "lucide-react";
+import { FileText, Download, Eye, Plus, Presentation, ScrollText, ExternalLink, Mail, Globe, Users } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface FormData {
@@ -25,238 +25,289 @@ const Documentos = () => {
     percentualHonorarios: 70,
   });
 
-  const documentos = [
+  const modelosApresentacao = [
     {
-      title: "Proposta Comercial",
-      description: "Proposta de serviços de recuperação tributária",
-      tipo: "Proposta",
-      status: "Rascunho",
-      data: "15/01/2024"
+      title: "Apresentação Executiva",
+      description: "Apresentação completa dos serviços de economia tributária",
+      icon: Presentation,
+      arquivo: "apresentacao-executiva.pptx"
     },
     {
-      title: "Contrato de Prestação de Serviços",
-      description: "Contrato para execução dos serviços tributários",
-      tipo: "Contrato",
-      status: "Pendente",
-      data: "20/01/2024"
+      title: "Pitch Comercial",
+      description: "Apresentação focada em vendas e resultados",
+      icon: Presentation,
+      arquivo: "pitch-comercial.pptx"
     },
     {
-      title: "Termo de Confidencialidade",
-      description: "Acordo de confidencialidade para proteção de dados",
-      tipo: "Termo",
-      status: "Assinado",
-      data: "10/01/2024"
+      title: "Cases de Sucesso",
+      description: "Exemplos de clientes com resultados alcançados",
+      icon: Users,
+      arquivo: "cases-sucesso.pdf"
     }
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Assinado":
-        return "bg-success/10 text-success";
-      case "Pendente":
-        return "bg-warning/10 text-warning";
-      case "Rascunho":
-        return "bg-muted text-muted-foreground";
-      default:
-        return "bg-muted text-muted-foreground";
+  const modelosContratos = [
+    {
+      title: "Contrato de Prestação de Serviços",
+      description: "Contrato padrão para serviços tributários",
+      icon: ScrollText,
+      arquivo: "contrato-prestacao-servicos.docx"
+    },
+    {
+      title: "Termo de Cessão de Direitos",
+      description: "Termo para cessão de créditos tributários",
+      icon: FileText,
+      arquivo: "termo-cessao-direitos.docx"
+    },
+    {
+      title: "Acordo de Confidencialidade",
+      description: "NDA para proteção de informações comerciais",
+      icon: FileText,
+      arquivo: "acordo-confidencialidade.docx"
     }
-  };
+  ];
+
+  const linksEmpresa = [
+    {
+      title: "Site Institucional",
+      description: "www.uniqueassessoria.com.br",
+      icon: Globe,
+      url: "https://www.uniqueassessoria.com.br"
+    },
+    {
+      title: "Portal do Cliente",
+      description: "Acesso exclusivo para clientes",
+      icon: ExternalLink,
+      url: "https://portal.uniqueassessoria.com.br"
+    },
+    {
+      title: "Central de Downloads",
+      description: "Materiais e documentos técnicos",
+      icon: Download,
+      url: "https://downloads.uniqueassessoria.com.br"
+    }
+  ];
+
+  const emailsEmpresa = [
+    {
+      departamento: "Comercial",
+      email: "comercial@uniqueassessoria.com.br",
+      responsavel: "Equipe de Vendas"
+    },
+    {
+      departamento: "Técnico",
+      email: "tecnico@uniqueassessoria.com.br",
+      responsavel: "Consultores Tributários"
+    },
+    {
+      departamento: "Suporte",
+      email: "suporte@uniqueassessoria.com.br",
+      responsavel: "Atendimento ao Cliente"
+    },
+    {
+      departamento: "Diretoria",
+      email: "diretoria@uniqueassessoria.com.br",
+      responsavel: "Direção Executiva"
+    }
+  ];
+
 
   return (
     <DashboardLayout formData={formData} onDataChange={setFormData}>
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Documentos</h1>
+            <h1 className="text-3xl font-bold text-foreground">Central de Documentos</h1>
             <p className="text-muted-foreground mt-2">
-              Propostas e contratos relacionados ao projeto
+              Modelos, contratos, links e informações da Unique Assessoria Empresarial
             </p>
           </div>
-          <Button onClick={() => {
-            toast({
-              title: "Editor de documentos",
-              description: "Abrindo editor para novo documento",
-            });
-          }}>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Documento
-          </Button>
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
-          {documentos.map((documento, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-primary/10 p-3 rounded-lg">
-                      <FileText className="h-6 w-6 text-primary" />
+        {/* Modelos de Apresentação */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+            <Presentation className="h-6 w-6 text-primary" />
+            Modelos de Apresentação
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {modelosApresentacao.map((modelo, index) => (
+              <Card key={index} className="hover:shadow-md transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-primary/10 p-2 rounded-lg">
+                      <modelo.icon className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg">{documento.title}</h3>
-                      <p className="text-muted-foreground text-sm">{documento.description}</p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          Tipo: {documento.tipo}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          Data: {documento.data}
-                        </span>
-                      </div>
+                      <CardTitle className="text-lg">{modelo.title}</CardTitle>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(documento.status)}`}>
-                      {documento.status}
-                    </span>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          toast({
-                            title: "Documento aberto",
-                            description: `Visualizando: ${documento.title}`,
-                          });
-                        }}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        Visualizar
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          toast({
-                            title: "Download iniciado",
-                            description: `Baixando ${documento.title}.pdf`,
-                          });
-                          // Simula download do arquivo
-                          const blob = new Blob(['Conteúdo do documento simulado'], { type: 'application/pdf' });
-                          const url = URL.createObjectURL(blob);
-                          const link = document.createElement('a');
-                          link.href = url;
-                          link.download = `${documento.title.replace(/\s+/g, '_')}.pdf`;
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-                          URL.revokeObjectURL(url);
-                        }}
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Download
-                      </Button>
-                    </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm mb-4">{modelo.description}</p>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        toast({
+                          title: "Visualizando modelo",
+                          description: modelo.title,
+                        });
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Visualizar
+                    </Button>
+                    <Button 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        toast({
+                          title: "Download iniciado",
+                          description: `Baixando ${modelo.arquivo}`,
+                        });
+                      }}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Modelos de Documento</CardTitle>
-              <CardDescription>
-                Templates pré-configurados para novos documentos
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    toast({
-                      title: "Modelo carregado",
-                      description: "Carregando modelo de proposta comercial",
-                    });
-                  }}
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Modelo de Proposta
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    toast({
-                      title: "Modelo carregado",
-                      description: "Carregando modelo de contrato de prestação de serviços",
-                    });
-                  }}
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Modelo de Contrato
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    toast({
-                      title: "Modelo carregado", 
-                      description: "Carregando modelo de termo de confidencialidade",
-                    });
-                  }}
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Modelo de Termo
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Modelos de Contratos */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+            <ScrollText className="h-6 w-6 text-primary" />
+            Contratos e Termos
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {modelosContratos.map((contrato, index) => (
+              <Card key={index} className="hover:shadow-md transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-secondary/10 p-2 rounded-lg">
+                      <contrato.icon className="h-5 w-5 text-secondary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{contrato.title}</CardTitle>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm mb-4">{contrato.description}</p>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        toast({
+                          title: "Visualizando documento",
+                          description: contrato.title,
+                        });
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Visualizar
+                    </Button>
+                    <Button 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        toast({
+                          title: "Download iniciado",
+                          description: `Baixando ${contrato.arquivo}`,
+                        });
+                      }}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
 
+        {/* Links da Empresa */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+            <Globe className="h-6 w-6 text-primary" />
+            Links da Empresa
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {linksEmpresa.map((link, index) => (
+              <Card key={index} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-accent/10 p-2 rounded-lg">
+                      <link.icon className="h-5 w-5 text-accent" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{link.title}</h3>
+                      <p className="text-sm text-muted-foreground">{link.description}</p>
+                    </div>
+                    <Button 
+                      size="sm"
+                      onClick={() => {
+                        window.open(link.url, '_blank');
+                        toast({
+                          title: "Abrindo link",
+                          description: link.title,
+                        });
+                      }}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Acessar
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Lista de E-mails */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+            <Mail className="h-6 w-6 text-primary" />
+            Contatos da Empresa
+          </h2>
           <Card>
-            <CardHeader>
-              <CardTitle>Configurações</CardTitle>
-              <CardDescription>
-                Personalize a geração de documentos
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Logotipo da Empresa</label>
-                  <Button 
-                    variant="outline" 
-                    className="w-full mt-2"
-                    onClick={() => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.accept = 'image/*';
-                      input.onchange = (e) => {
-                        const file = (e.target as HTMLInputElement).files?.[0];
-                        if (file) {
-                          toast({
-                            title: "Upload concluído",
-                            description: `Arquivo: ${file.name} (${(file.size / 1024).toFixed(1)}KB)`,
-                          });
-                        }
-                      };
-                      input.click();
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Fazer Upload
-                  </Button>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Assinatura Digital</label>
-                  <Button 
-                    variant="outline" 
-                    className="w-full mt-2"
-                    onClick={() => {
-                      toast({
-                        title: "Configurações",
-                        description: "Abrindo configurador de assinatura digital",
-                      });
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Configurar
-                  </Button>
-                </div>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {emailsEmpresa.map((contato, index) => (
+                  <div key={index} className="flex items-center gap-4 p-4 border rounded-lg">
+                    <div className="bg-primary/10 p-2 rounded-lg">
+                      <Mail className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{contato.departamento}</h3>
+                      <p className="text-sm text-muted-foreground">{contato.responsavel}</p>
+                      <p className="text-sm font-medium text-primary">{contato.email}</p>
+                    </div>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        window.location.href = `mailto:${contato.email}`;
+                        toast({
+                          title: "Abrindo e-mail",
+                          description: `Enviando para ${contato.departamento}`,
+                        });
+                      }}
+                    >
+                      Enviar E-mail
+                    </Button>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

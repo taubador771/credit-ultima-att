@@ -75,14 +75,14 @@ const Documentos = () => {
       url: "https://www.uniqueassessoria.com.br"
     },
     {
-      title: "Portal do Cliente",
-      description: "Acesso exclusivo para clientes",
+      title: "Central de Contatos",
+      description: "Contatos e informações de atendimento",
       icon: ExternalLink,
       url: "https://portal.uniqueassessoria.com.br"
     },
     {
-      title: "Central de Downloads",
-      description: "Materiais e documentos técnicos",
+      title: "Assinatura Digital",
+      description: "Sistema de assinatura eletrônica",
       icon: Download,
       url: "https://downloads.uniqueassessoria.com.br"
     }

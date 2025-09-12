@@ -1,4 +1,6 @@
 import jsPDF from 'jspdf';
+import { timbradoService } from '@/services/timbradoService';
+import type { ConfiguracaoTimbrado } from '@/types/timbrado';
 
 interface RelatorioIA {
   tipo: "executivo" | "detalhado" | "projecao";
@@ -47,7 +49,132 @@ const carregarFontesPDF = async (pdf: jsPDF) => {
   }
 };
 
-// Função para criar gráfico de pizza (donut chart) em canvas
+// Função para adicionar cabeçalho personalizado com timbrado
+const adicionarCabecalho = (pdf: jsPDF, config: ConfiguracaoTimbrado, numeroRelatorio: string) => {
+  // Fundo do cabeçalho com gradiente simulado
+  pdf.setFillColor(59, 130, 246); // Azul primário
+  pdf.rect(0, 0, 210, 45, 'F');
+  
+  // Logo da empresa se disponível
+  if (config.logo) {
+    try {
+      pdf.addImage(config.logo.base64, 'PNG', 15, 8, 25, 15);
+    } catch (error) {
+      console.warn('Erro ao adicionar logo:', error);
+    }
+  }
+  
+  // Nome da empresa
+  pdf.setFont("Roboto", "bold");
+  pdf.setFontSize(18);
+  pdf.setTextColor(255, 255, 255);
+  const startX = config.logo ? 45 : 15;
+  pdf.text(config.razaoSocial, startX, 15);
+  
+  // CNPJ
+  pdf.setFont("Roboto", "normal");
+  pdf.setFontSize(10);
+  pdf.text(`CNPJ: ${config.cnpj}`, startX, 22);
+  
+  // Endereço resumido
+  const enderecoCompleto = `${config.endereco.logradouro}, ${config.endereco.numero} - ${config.endereco.cidade}/${config.endereco.uf}`;
+  pdf.text(enderecoCompleto, startX, 28);
+  
+  // Contato
+  pdf.text(`${config.contato.telefone} | ${config.contato.email}`, startX, 34);
+  
+  // Data, hora e número do relatório
+  pdf.setFontSize(9);
+  const agora = new Date().toLocaleString('pt-BR');
+  pdf.text(`Relatório Nº: ${numeroRelatorio}`, 140, 15);
+  pdf.text(`Gerado em: ${agora}`, 140, 22);
+  
+  if (config.contato.website) {
+    pdf.text(config.contato.website, 140, 29);
+  }
+  
+  // Linha separadora
+  pdf.setDrawColor(255, 255, 255);
+  pdf.setLineWidth(0.5);
+  pdf.line(15, 40, 195, 40);
+};
+
+// Função para adicionar rodapé com timbrado
+const adicionarRodape = (pdf: jsPDF, config: ConfiguracaoTimbrado, numeroRelatorio: string, numeroPagina: number, totalPaginas: number) => {
+  const pageHeight = pdf.internal.pageSize.height;
+  
+  // Linha separadora
+  pdf.setDrawColor(200, 200, 200);
+  pdf.setLineWidth(0.5);
+  pdf.line(15, pageHeight - 30, 195, pageHeight - 30);
+  
+  // Informações da empresa
+  pdf.setFont("Roboto", "normal");
+  pdf.setFontSize(8);
+  pdf.setTextColor(100, 100, 100);
+  
+  pdf.text(config.razaoSocial.toUpperCase(), 15, pageHeight - 23);
+  pdf.text(`${config.endereco.logradouro}, ${config.endereco.numero} - ${config.endereco.cidade}/${config.endereco.uf} - CEP: ${config.endereco.cep}`, 15, pageHeight - 19);
+  pdf.text(`${config.contato.telefone} | ${config.contato.email}`, 15, pageHeight - 15);
+  
+  if (config.contato.website) {
+    pdf.text(config.contato.website, 15, pageHeight - 11);
+  }
+  
+  // Numeração das páginas
+  pdf.text(`Página ${numeroPagina} de ${totalPaginas}`, 150, pageHeight - 15);
+  
+  // Código de validação
+  const codigoValidacao = `${numeroRelatorio}-${Date.now().toString().slice(-6)}`;
+  pdf.text(`Cód. Validação: ${codigoValidacao}`, 150, pageHeight - 11);
+  
+  // Disclaimer
+  pdf.setFontSize(6);
+  pdf.text("Este documento foi gerado automaticamente pelo sistema Unique Créditos Tributários", 15, pageHeight - 7);
+};
+
+// Função para adicionar marca d'água com timbrado
+const adicionarMarcaDagua = (pdf: jsPDF, config: ConfiguracaoTimbrado) => {
+  if (!config.tema.mostrarMarcaDagua) return;
+  
+  const pageWidth = pdf.internal.pageSize.width;
+  const pageHeight = pdf.internal.pageSize.height;
+  
+  // Salvar estado atual
+  const currentAlpha = pdf.internal.getGraphicsState();
+  
+  // Configurar transparência
+  pdf.setGState(new pdf.GState({ opacity: 0.08 }));
+  
+  if (config.logo) {
+    // Usar logo como marca d'água se disponível
+    try {
+      const logoSize = 80;
+      const x = (pageWidth - logoSize) / 2;
+      const y = (pageHeight - logoSize) / 2;
+      pdf.addImage(config.logo.base64, 'PNG', x, y, logoSize, logoSize);
+    } catch (error) {
+      console.warn('Erro ao adicionar marca d\'água com logo:', error);
+    }
+  } else {
+    // Texto da marca d'água
+    pdf.setFont("Roboto", "bold");
+    pdf.setFontSize(45);
+    pdf.setTextColor(100, 100, 100);
+    
+    // Rotacionar e posicionar o texto
+    const angle = -45 * Math.PI / 180;
+    const nomeEmpresa = config.razaoSocial.split(' ').slice(0, 2).join(' ').toUpperCase();
+    pdf.text(nomeEmpresa, pageWidth / 2, pageHeight / 2, {
+      angle: angle,
+      align: 'center'
+    });
+  }
+  
+  // Restaurar estado original
+  pdf.setGState(currentAlpha);
+};
+
 const criarGraficoPizza = (dados: { label: string; valor: number; cor: string }[]): HTMLCanvasElement => {
   const canvas = document.createElement('canvas');
   canvas.width = 400;
@@ -67,7 +194,7 @@ const criarGraficoPizza = (dados: { label: string; valor: number; cor: string }[
   const total = dados.reduce((sum, item) => sum + item.valor, 0);
 
   // Desenhar fatias
-  dados.forEach((item, index) => {
+  dados.forEach((item) => {
     const sliceAngle = (item.valor / total) * 2 * Math.PI;
     
     ctx.beginPath();
@@ -86,99 +213,6 @@ const criarGraficoPizza = (dados: { label: string; valor: number; cor: string }[
   ctx.textAlign = 'center';
   ctx.fillText('Distribuição dos Valores', centerX, 30);
 
-  // Legenda
-  let legendY = centerY + radius + 30;
-  dados.forEach((item, index) => {
-    const x = 50 + (index % 2) * 150;
-    const y = legendY + Math.floor(index / 2) * 25;
-    
-    // Cor
-    ctx.fillStyle = item.cor;
-    ctx.fillRect(x, y - 10, 15, 15);
-    
-    // Texto
-    ctx.fillStyle = '#1F2937';
-    ctx.font = '11px Arial';
-    ctx.textAlign = 'left';
-    ctx.fillText(item.label, x + 20, y);
-    
-    const percentual = ((item.valor / total) * 100).toFixed(1);
-    ctx.fillText(`${percentual}%`, x + 20, y + 12);
-  });
-
-  return canvas;
-};
-
-// Função para criar gráfico de barras comparativo
-const criarGraficoBarras = (dados: { label: string; valor: number }[]): HTMLCanvasElement => {
-  const canvas = document.createElement('canvas');
-  canvas.width = 400;
-  canvas.height = 300;
-  const ctx = canvas.getContext('2d')!;
-
-  // Background
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Configurações do gráfico
-  const margins = { top: 40, right: 40, bottom: 60, left: 80 };
-  const chartWidth = canvas.width - margins.left - margins.right;
-  const chartHeight = canvas.height - margins.top - margins.bottom;
-
-  // Encontrar valor máximo
-  const maxValue = Math.max(...dados.map(d => d.valor));
-  const scale = chartHeight / maxValue;
-
-  // Desenhar barras
-  const barWidth = chartWidth / dados.length * 0.8;
-  const barSpacing = chartWidth / dados.length * 0.2;
-
-  dados.forEach((item, index) => {
-    const x = margins.left + index * (barWidth + barSpacing);
-    const barHeight = item.valor * scale;
-    const y = margins.top + chartHeight - barHeight;
-
-    // Barra
-    ctx.fillStyle = '#3B82F6';
-    ctx.fillRect(x, y, barWidth, barHeight);
-
-    // Valor no topo da barra
-    ctx.fillStyle = '#1F2937';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(
-      `R$ ${item.valor.toLocaleString('pt-BR')}`,
-      x + barWidth / 2,
-      y - 5
-    );
-
-    // Label no eixo X
-    ctx.save();
-    ctx.translate(x + barWidth / 2, canvas.height - 20);
-    ctx.rotate(-Math.PI / 6);
-    ctx.textAlign = 'right';
-    ctx.fillText(item.label, 0, 0);
-    ctx.restore();
-  });
-
-  // Título
-  ctx.fillStyle = '#1F2937';
-  ctx.font = 'bold 16px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('Análise Financeira', canvas.width / 2, 25);
-
-  // Eixos
-  ctx.strokeStyle = '#6B7280';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  // Eixo Y
-  ctx.moveTo(margins.left, margins.top);
-  ctx.lineTo(margins.left, margins.top + chartHeight);
-  // Eixo X
-  ctx.moveTo(margins.left, margins.top + chartHeight);
-  ctx.lineTo(margins.left + chartWidth, margins.top + chartHeight);
-  ctx.stroke();
-
   return canvas;
 };
 
@@ -187,6 +221,31 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     const pdf = new jsPDF();
     await carregarFontesPDF(pdf);
     
+    // Configurar timbrado
+    const config = timbradoService.getConfiguracao();
+    const numeroRelatorio = timbradoService.obterProximoNumeroRelatorio();
+    let totalPaginas = 1;
+    
+    // Adicionar cabeçalho e marca d'água
+    adicionarCabecalho(pdf, config, numeroRelatorio);
+    adicionarMarcaDagua(pdf, config);
+    
+    const economiaCredito = formData.valorMensal * (formData.percentualCredito / 100);
+    const honorarios = economiaCredito * (formData.percentualHonorarios / 100);
+    const economiaMensal = economiaCredito - honorarios;
+    const economiaTotal = economiaMensal * formData.periodo;
+    
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    let yPosition = 55;
+    const margin = 15;
+    
+    // Título principal
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(22);
+    pdf.text('ANÁLISE DE ECONOMIA TRIBUTÁRIA', pageWidth / 2, 20, { align: 'center' });
+    
+    // ... rest of PDF content generation would continue here
+
     // Calcula métricas básicas
     const economiaCredito = formData.valorMensal * (formData.percentualCredito / 100);
     const honorarios = economiaCredito * (formData.percentualHonorarios / 100);
@@ -200,17 +259,14 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     const margin = 15;
     let yPosition = margin;
 
-    // Cabeçalho com gradiente visual
-    pdf.setFillColor(59, 130, 246);
-    pdf.rect(0, 0, pageWidth, 50, 'F');
-    
+    // Cabeçalho com dados da empresa configurada
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(22);
     pdf.text('ANÁLISE DE ECONOMIA TRIBUTÁRIA', pageWidth / 2, 20, { align: 'center' });
     pdf.setFontSize(16);
-    pdf.text(`${formData.nomeEmpresa || "Sua Empresa"}`, pageWidth / 2, 35, { align: 'center' });
+    pdf.text(`${formData.nomeEmpresa || config.razaoSocial}`, pageWidth / 2, 35, { align: 'center' });
 
-    yPosition = 70;
+    yPosition = 60;
 
     // KPIs Visuais - Caixas destacadas
     const criarKPIBox = (x: number, y: number, width: number, height: number, titulo: string, valor: string, cor: [number, number, number]) => {
@@ -294,9 +350,12 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     const canvasPizza = criarGraficoPizza(dadosPizza);
     const imgDataPizza = canvasPizza.toDataURL('image/png');
     
-    if (yPosition + 90 > pageHeight - margin) {
+    if (yPosition + 90 > pageHeight - 40) { // Ajustado para rodapé expandido
+      totalPaginas++;
       pdf.addPage();
-      yPosition = margin;
+      adicionarCabecalho(pdf, config, numeroRelatorio);
+      adicionarMarcaDagua(pdf, config);
+      yPosition = 55;
     }
     
     pdf.addImage(imgDataPizza, 'PNG', margin, yPosition, 100, 75);
@@ -325,9 +384,12 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     yPosition += 95;
 
     // Projeção temporal visual
-    if (yPosition + 60 > pageHeight - margin) {
+    if (yPosition + 60 > pageHeight - 40) {
+      totalPaginas++;
       pdf.addPage();
-      yPosition = margin;
+      adicionarCabecalho(pdf, config, numeroRelatorio);
+      adicionarMarcaDagua(pdf, config);
+      yPosition = 55;
     }
 
     pdf.setFontSize(16);
@@ -351,9 +413,12 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     yPosition += 140;
 
     // Call to Action forte
-    if (yPosition + 40 > pageHeight - margin) {
+    if (yPosition + 40 > pageHeight - 40) {
+      totalPaginas++;
       pdf.addPage();
-      yPosition = margin;
+      adicionarCabecalho(pdf, config, numeroRelatorio);
+      adicionarMarcaDagua(pdf, config);
+      yPosition = 55;
     }
 
     pdf.setFillColor(16, 185, 129);
@@ -371,9 +436,12 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
 
     // Análise de IA resumida e persuasiva
     if (tipoRelatorio === 'detalhado' && relatorio.conteudo) {
-      if (yPosition + 30 > pageHeight - margin) {
+      if (yPosition + 30 > pageHeight - 40) {
+        totalPaginas++;
         pdf.addPage();
-        yPosition = margin;
+        adicionarCabecalho(pdf, config, numeroRelatorio);
+        adicionarMarcaDagua(pdf, config);
+        yPosition = 55;
       }
 
       pdf.setTextColor(0, 0, 0);
@@ -389,9 +457,12 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
       const pontosPrincipais = relatorio.resumoExecutivo.split('.').slice(0, 3);
       pontosPrincipais.forEach((ponto, index) => {
         if (ponto.trim()) {
-          if (yPosition > pageHeight - margin) {
+          if (yPosition > pageHeight - 40) {
+            totalPaginas++;
             pdf.addPage();
-            yPosition = margin;
+            adicionarCabecalho(pdf, config, numeroRelatorio);
+            adicionarMarcaDagua(pdf, config);
+            yPosition = 55;
           }
           pdf.text(`• ${ponto.trim()}`, margin, yPosition);
           yPosition += 8;
@@ -410,31 +481,27 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
         pdf.setFontSize(10);
         pdf.setFont(undefined, 'normal');
         relatorio.recomendacoes.slice(0, 3).forEach((rec, index) => {
-          if (yPosition > pageHeight - margin) {
+          if (yPosition > pageHeight - 40) {
+            totalPaginas++;
             pdf.addPage();
-            yPosition = margin;
+            adicionarCabecalho(pdf, config, numeroRelatorio);
+            adicionarMarcaDagua(pdf, config);
+            yPosition = 55;
           }
           pdf.text(`${index + 1}. ${rec}`, margin, yPosition);
           yPosition += 8;
         });
       }
     }
+    // Adicionar rodapé em todas as páginas
+    for (let i = 1; i <= totalPaginas; i++) {
+      pdf.setPage(i);
+      adicionarRodape(pdf, config, numeroRelatorio, i, totalPaginas);
+    }
 
-    // Rodapé com contato
-    const finalPageHeight = pdf.internal.pageSize.getHeight();
-    yPosition = finalPageHeight - 30;
-    
-    pdf.setFillColor(59, 130, 246);
-    pdf.rect(0, finalPageHeight - 25, pageWidth, 25, 'F');
-    
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(9);
-    pdf.text(`📞 Entre em contato conosco para começar a economizar hoje mesmo!`, margin, finalPageHeight - 15);
-    pdf.text(`📅 Gerado em ${new Date().toLocaleDateString('pt-BR')} • Unique Créditos Federais`, 
-             pageWidth - margin, finalPageHeight - 15, { align: 'right' });
-
-    // Download do PDF
-    const fileName = `Economia_${formData.nomeEmpresa?.replace(/\s+/g, '_') || 'Empresa'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    // Download do PDF com número sequencial
+    const dataFormatada = new Date().toISOString().split('T')[0];
+    const fileName = `${numeroRelatorio}_${tipoRelatorio}_${formData.nomeEmpresa?.replace(/\s+/g, '_') || config.razaoSocial.replace(/\s+/g, '_')}_${dataFormatada}.pdf`;
     pdf.save(fileName);
     
   } catch (error) {
@@ -446,44 +513,54 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
 export const gerarPDFPersonalizado = async (conteudo: string, nomeArquivo: string): Promise<void> => {
   try {
     const pdf = new jsPDF();
+    await carregarFontesPDF(pdf);
+    
+    // Configurar timbrado
+    const config = timbradoService.getConfiguracao();
+    const numeroRelatorio = timbradoService.obterProximoNumeroRelatorio();
+    
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const margin = 20;
-    let yPosition = margin;
-
-    // Cabeçalho
-    pdf.setFillColor(59, 130, 246);
-    pdf.rect(0, 0, pageWidth, 40, 'F');
     
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(20);
-    pdf.text('RELATÓRIO PERSONALIZADO', pageWidth / 2, 25, { align: 'center' });
-
-    yPosition = 60;
+    // Adicionar cabeçalho e marca d'água
+    adicionarCabecalho(pdf, config, numeroRelatorio);
+    adicionarMarcaDagua(pdf, config);
+    
+    let yPosition = 65; // Maior espaçamento devido ao cabeçalho expandido
+    // Título do conteúdo personalizado
+    pdf.setFontSize(18);
+    pdf.setFont("Roboto", "bold");
+    pdf.text('RELATÓRIO PERSONALIZADO', pageWidth / 2, 20, { align: 'center' });
     pdf.setTextColor(0, 0, 0);
 
+    let totalPaginas = 1;
+    
     // Conteúdo
     pdf.setFontSize(11);
-    pdf.setFont(undefined, 'normal');
+    pdf.setFont("Roboto", "normal");
     const conteudoLines = pdf.splitTextToSize(conteudo, pageWidth - 2 * margin);
     conteudoLines.forEach((line: string) => {
-      if (yPosition > pageHeight - margin) {
+      if (yPosition > pageHeight - 50) { // Espaço para rodapé
+        totalPaginas++;
         pdf.addPage();
-        yPosition = margin;
+        adicionarCabecalho(pdf, config, numeroRelatorio);
+        adicionarMarcaDagua(pdf, config);
+        yPosition = 65;
       }
       pdf.text(line, margin, yPosition);
       yPosition += 6;
     });
 
-    // Rodapé
-    yPosition = pageHeight - margin;
-    pdf.setFontSize(9);
-    pdf.setTextColor(128, 128, 128);
-    pdf.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margin, yPosition);
-    pdf.text('Sistema de Análise Tributária - Unique Créditos Federais', pageWidth - margin, yPosition, { align: 'right' });
+    // Adicionar rodapé em todas as páginas
+    for (let i = 1; i <= totalPaginas; i++) {
+      pdf.setPage(i);
+      adicionarRodape(pdf, config, numeroRelatorio, i, totalPaginas);
+    }
 
-    // Download
-    const fileName = `${nomeArquivo}_${new Date().toISOString().split('T')[0]}.pdf`;
+    // Download com número sequencial
+    const dataFormatada = new Date().toISOString().split('T')[0];
+    const fileName = `${numeroRelatorio}_${nomeArquivo}_${dataFormatada}.pdf`;
     pdf.save(fileName);
     
   } catch (error) {

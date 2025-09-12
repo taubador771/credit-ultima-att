@@ -2,9 +2,10 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, FileText, Download, Calendar, Plus, Bot, Loader2, AlertCircle } from "lucide-react";
+import { BarChart3, FileText, Download, Calendar, Plus, Bot, Loader2, AlertCircle, Building2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ConfiguracoesIA, { IAConfig } from "@/components/ConfiguracoesIA";
+import ConfiguracaoTimbrado from "@/components/ConfiguracaoTimbrado";
 import { iaService } from "@/services/iaService";
 import { gerarPDF } from "@/utils/pdfGenerator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -178,12 +179,13 @@ const Relatorios = () => {
             </p>
           </div>
           <div className="flex gap-2">
+            <ConfiguracaoTimbrado />
             <ConfiguracoesIA 
               onConfigSaved={handleConfigIASaved}
               currentConfig={configIA || undefined}
             />
             {configIA?.habilitado && (
-              <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-success bg-success-light px-3 py-2 rounded-lg">
                 <Bot className="h-4 w-4" />
                 IA Ativa
               </div>

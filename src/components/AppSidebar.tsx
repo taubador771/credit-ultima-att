@@ -48,16 +48,19 @@ export function AppSidebar({ formData, onDataChange }: AppSidebarProps) {
       description: "Visão geral dos resultados"
     },
     {
-      title: "Relatórios",
-      icon: BarChart3,
-      path: "/relatorios",
-      description: "Análises detalhadas"
-    },
-    {
       title: "Documentos",
       icon: FileText,
       path: "/documentos",
       description: "Propostas e contratos"
+    }
+  ];
+
+  const configItems = [
+    {
+      title: "Relatórios",
+      icon: BarChart3,
+      path: "/relatorios",
+      description: "Análises detalhadas"
     },
     {
       title: "Ajuda",
@@ -129,21 +132,48 @@ export function AppSidebar({ formData, onDataChange }: AppSidebarProps) {
           </SidebarGroupLabel>
           
           <SidebarGroupContent>
-            <ConfigurationsModal 
-              formData={formData} 
-              onDataChange={onDataChange}
-              trigger={
-                <SidebarMenuButton className="w-full hover:bg-muted/50">
-                  <Settings className="h-4 w-4" />
-                  {open && (
-                    <div className="flex flex-col items-start">
-                      <span>Simulador</span>
-                      <span className="text-xs text-muted-foreground">Parâmetros de cálculo</span>
-                    </div>
-                  )}
-                </SidebarMenuButton>
-              }
-            />
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <ConfigurationsModal 
+                  formData={formData} 
+                  onDataChange={onDataChange}
+                  trigger={
+                    <SidebarMenuButton className="w-full hover:bg-muted/50">
+                      <Settings className="h-4 w-4" />
+                      {open && (
+                        <div className="flex flex-col items-start">
+                          <span>Simulador</span>
+                          <span className="text-xs text-muted-foreground">Parâmetros de cálculo</span>
+                        </div>
+                      )}
+                    </SidebarMenuButton>
+                  }
+                />
+              </SidebarMenuItem>
+              
+              {configItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink 
+                      to={item.path}
+                      className={({ isActive: linkActive }) => 
+                        `w-full flex items-center gap-3 ${
+                          linkActive ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted/50'
+                        }`
+                      }
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {open && (
+                        <div className="flex flex-col items-start">
+                          <span>{item.title}</span>
+                          <span className="text-xs text-muted-foreground">{item.description}</span>
+                        </div>
+                      )}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 

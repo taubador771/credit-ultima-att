@@ -283,9 +283,9 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     // ... rest of PDF content generation would continue here
 
     // Calcula métricas básicas
-    const economiaCredito = formData.valorMensal * (formData.percentualCredito / 100);
-    const honorarios = economiaCredito * (formData.percentualHonorarios / 100);
-    const economiaMensal = economiaCredito - honorarios;
+    const creditoCalculado = formData.valorMensal * (formData.percentualCredito / 100);
+    const honorarios = creditoCalculado * (formData.percentualHonorarios / 100);
+    const economiaMensal = creditoCalculado - honorarios;
     const economiaTotal = economiaMensal * formData.periodo;
     const pagamentoDireto = formData.valorMensal * (1 - formData.percentualCredito / 100);
 

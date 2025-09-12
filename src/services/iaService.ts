@@ -99,7 +99,7 @@ export class IAService {
         messages: [
           {
             role: 'system',
-            content: promptSistema || 'Você é um especialista em análise financeira brasileira.'
+            content: promptSistema || 'Você é um especialista em vendas e análise de economia tributária brasileira focado em mostrar o potencial de economia da empresa.'
           },
           {
             role: 'user',
@@ -144,7 +144,7 @@ export class IAService {
         model: modelo,
         max_tokens: 2000,
         temperature: temperatura,
-        system: promptSistema || 'Você é um especialista em análise financeira brasileira.',
+        system: promptSistema || 'Você é um especialista em vendas e análise de economia tributária brasileira focado em mostrar o potencial de economia da empresa.',
         messages: [
           {
             role: 'user',
@@ -193,7 +193,7 @@ export class IAService {
           {
             parts: [
               {
-                text: `${promptSistema || 'Você é um especialista em análise financeira brasileira.'}\n\n${prompt}`,
+                text: `${promptSistema || 'Você é um especialista em vendas e análise de economia tributária brasileira focado em mostrar o potencial de economia da empresa.'}\n\n${prompt}`,
               },
             ],
           },

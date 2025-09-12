@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { HelpCircle, Search, Book, MessageCircle, Phone, Mail } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface FormData {
   nomeEmpresa: string;
@@ -15,6 +16,7 @@ interface FormData {
 }
 
 const Ajuda = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<FormData>({
     nomeEmpresa: "",
     tributos: [],
@@ -159,15 +161,32 @@ const Ajuda = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => {
+                  toast({
+                    title: "Contato telefônico",
+                    description: "Número copiado para área de transferência",
+                  });
+                  navigator.clipboard.writeText("(11) 99999-9999");
+                }}>
                   <Phone className="h-4 w-4 mr-2" />
                   (11) 99999-9999
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => {
+                  toast({
+                    title: "Email de contato", 
+                    description: "E-mail copiado para área de transferência",
+                  });
+                  navigator.clipboard.writeText("suporte@unique.com.br");
+                }}>
                   <Mail className="h-4 w-4 mr-2" />
                   suporte@unique.com.br
                 </Button>
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => {
+                  toast({
+                    title: "Chat de suporte",
+                    description: "Iniciando conversa com nossa equipe",
+                  });
+                }}>
                   Abrir Chat de Suporte
                 </Button>
               </CardContent>
@@ -195,7 +214,12 @@ const Ajuda = () => {
                     </div>
                   </div>
                 ))}
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={() => {
+                  toast({
+                    title: "Tutoriais completos",
+                    description: "Redirecionando para área de tutoriais",
+                  });
+                }}>
                   Ver Todos os Tutoriais
                 </Button>
               </CardContent>
@@ -213,15 +237,30 @@ const Ajuda = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="outline" className="h-20 flex-col" onClick={() => {
+                toast({
+                  title: "Manual do usuário",
+                  description: "Abrindo documentação completa do sistema",
+                });
+              }}>
                 <Book className="h-6 w-6 mb-2" />
                 Manual do Usuário
               </Button>
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="outline" className="h-20 flex-col" onClick={() => {
+                toast({
+                  title: "Guia de cálculos",
+                  description: "Abrindo explicação detalhada dos cálculos tributários",
+                });
+              }}>
                 <HelpCircle className="h-6 w-6 mb-2" />
                 Guia de Cálculos
               </Button>
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="outline" className="h-20 flex-col" onClick={() => {
+                toast({
+                  title: "Base de conhecimento",
+                  description: "Acessando biblioteca de artigos e tutoriais",
+                });
+              }}>
                 <MessageCircle className="h-6 w-6 mb-2" />
                 Base de Conhecimento
               </Button>

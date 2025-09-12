@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, FileText, Download, Calendar, Plus } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface FormData {
   nomeEmpresa: string;
@@ -14,6 +15,7 @@ interface FormData {
 }
 
 const Relatorios = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<FormData>({
     nomeEmpresa: "",
     tributos: [],
@@ -85,11 +87,20 @@ const Relatorios = () => {
                     disabled={relatorio.status !== "Disponível"}
                     onClick={() => {
                       if (relatorio.status === "Disponível") {
-                        // Simula geração e download do relatório
+                        toast({
+                          title: "Download iniciado",
+                          description: `Baixando ${relatorio.title}.pdf`,
+                        });
+                        // Simula download do arquivo
+                        const blob = new Blob(['Conteúdo do relatório simulado'], { type: 'application/pdf' });
+                        const url = URL.createObjectURL(blob);
                         const link = document.createElement('a');
-                        link.href = '#';
+                        link.href = url;
                         link.download = `${relatorio.title.replace(/\s+/g, '_')}.pdf`;
-                        alert(`Gerando relatório: ${relatorio.title}\nO download iniciará em breve...`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
                       }
                     }}
                   >
@@ -111,7 +122,12 @@ const Relatorios = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full" onClick={() => alert("Iniciando geração de relatório personalizado com IA...")}>
+              <Button className="w-full" onClick={() => {
+                toast({
+                  title: "IA ativada",
+                  description: "Iniciando geração personalizada do relatório com IA",
+                });
+              }}>
                 <Plus className="h-4 w-4 mr-2" />
                 Gerar Relatório com IA
               </Button>
@@ -135,7 +151,13 @@ const Relatorios = () => {
                 <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">Histórico protegido</p>
                 <p className="text-xs">Entre com credenciais para acessar</p>
-                <Button variant="outline" size="sm" className="mt-2" onClick={() => alert("Funcionalidade disponível após autenticação de usuário")}>
+                <Button variant="outline" size="sm" className="mt-2" onClick={() => {
+                  toast({
+                    title: "Acesso restrito",
+                    description: "Funcionalidade disponível após autenticação",
+                    variant: "destructive",
+                  });
+                }}>
                   Acessar Histórico
                 </Button>
               </div>

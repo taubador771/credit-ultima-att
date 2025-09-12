@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, Eye, Plus } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface FormData {
   nomeEmpresa: string;
@@ -14,6 +15,7 @@ interface FormData {
 }
 
 const Documentos = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<FormData>({
     nomeEmpresa: "",
     tributos: [],
@@ -70,7 +72,12 @@ const Documentos = () => {
               Propostas e contratos relacionados ao projeto
             </p>
           </div>
-          <Button onClick={() => alert("Abrindo editor de novo documento...")}>
+          <Button onClick={() => {
+            toast({
+              title: "Editor de documentos",
+              description: "Abrindo editor para novo documento",
+            });
+          }}>
             <Plus className="h-4 w-4 mr-2" />
             Novo Documento
           </Button>
@@ -107,8 +114,10 @@ const Documentos = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => {
-                          // Simula visualização do documento
-                          alert(`Visualizando: ${documento.title}`);
+                          toast({
+                            title: "Documento aberto",
+                            description: `Visualizando: ${documento.title}`,
+                          });
                         }}
                       >
                         <Eye className="h-4 w-4 mr-2" />
@@ -118,11 +127,20 @@ const Documentos = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => {
-                          // Simula download do documento
+                          toast({
+                            title: "Download iniciado",
+                            description: `Baixando ${documento.title}.pdf`,
+                          });
+                          // Simula download do arquivo
+                          const blob = new Blob(['Conteúdo do documento simulado'], { type: 'application/pdf' });
+                          const url = URL.createObjectURL(blob);
                           const link = document.createElement('a');
-                          link.href = '#';
+                          link.href = url;
                           link.download = `${documento.title.replace(/\s+/g, '_')}.pdf`;
-                          alert(`Download iniciado: ${documento.title}.pdf`);
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          URL.revokeObjectURL(url);
                         }}
                       >
                         <Download className="h-4 w-4 mr-2" />
@@ -149,7 +167,12 @@ const Documentos = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => alert("Carregando modelo de proposta comercial...")}
+                  onClick={() => {
+                    toast({
+                      title: "Modelo carregado",
+                      description: "Carregando modelo de proposta comercial",
+                    });
+                  }}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Modelo de Proposta
@@ -157,7 +180,12 @@ const Documentos = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => alert("Carregando modelo de contrato de prestação de serviços...")}
+                  onClick={() => {
+                    toast({
+                      title: "Modelo carregado",
+                      description: "Carregando modelo de contrato de prestação de serviços",
+                    });
+                  }}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Modelo de Contrato
@@ -165,7 +193,12 @@ const Documentos = () => {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => alert("Carregando modelo de termo de confidencialidade...")}
+                  onClick={() => {
+                    toast({
+                      title: "Modelo carregado", 
+                      description: "Carregando modelo de termo de confidencialidade",
+                    });
+                  }}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Modelo de Termo
@@ -195,7 +228,10 @@ const Documentos = () => {
                       input.onchange = (e) => {
                         const file = (e.target as HTMLInputElement).files?.[0];
                         if (file) {
-                          alert(`Upload do arquivo: ${file.name} (${(file.size / 1024).toFixed(1)}KB)`);
+                          toast({
+                            title: "Upload concluído",
+                            description: `Arquivo: ${file.name} (${(file.size / 1024).toFixed(1)}KB)`,
+                          });
                         }
                       };
                       input.click();
@@ -210,7 +246,12 @@ const Documentos = () => {
                   <Button 
                     variant="outline" 
                     className="w-full mt-2"
-                    onClick={() => alert("Abrindo configurador de assinatura digital...")}
+                    onClick={() => {
+                      toast({
+                        title: "Configurações",
+                        description: "Abrindo configurador de assinatura digital",
+                      });
+                    }}
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Configurar

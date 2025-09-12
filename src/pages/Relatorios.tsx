@@ -79,7 +79,7 @@ const Relatorios = () => {
           throw new Error("Tipo de relatório não suportado");
       }
 
-      gerarPDF(relatorio, formData, nomeArquivo);
+      await gerarPDF(relatorio, formData, nomeArquivo);
       
       toast({
         title: "Relatório gerado!",
@@ -121,7 +121,7 @@ const Relatorios = () => {
     
     try {
       const relatorio = await iaService.gerarRelatorioPersonalizado(formData, promptPersonalizado);
-      gerarPDF(relatorio, formData, "Relatório_Personalizado");
+      await gerarPDF(relatorio, formData, "Relatório_Personalizado");
       
       toast({
         title: "Relatório personalizado gerado!",

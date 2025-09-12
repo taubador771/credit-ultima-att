@@ -92,10 +92,6 @@ export function ConfigurationsModal({ formData, onDataChange, trigger }: Configu
   };
 
   const handleInputChange = (field: keyof FormData, value: string | number | boolean) => {
-    // Para campos numéricos, mantém o valor anterior se a conversão falhar
-    if (typeof value === 'number' && isNaN(value)) {
-      return;
-    }
     setLocalData({ ...localData, [field]: value });
   };
 
@@ -198,12 +194,10 @@ export function ConfigurationsModal({ formData, onDataChange, trigger }: Configu
                       id="valorMensal"
                       type="number"
                       placeholder="100000"
-                      value={localData.valorMensal}
+                      value={localData.valorMensal || ""}
                       onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (!isNaN(value) && value > 0) {
-                          handleInputChange("valorMensal", value);
-                        }
+                        const value = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                        handleInputChange("valorMensal", value);
                       }}
                     />
                     <p className="text-xs text-muted-foreground">
@@ -243,10 +237,8 @@ export function ConfigurationsModal({ formData, onDataChange, trigger }: Configu
                       max="95"
                       value={localData.percentualCredito}
                       onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (!isNaN(value) && value >= 0 && value <= 95) {
-                          handleInputChange("percentualCredito", value);
-                        }
+                        const value = e.target.value === "" ? 95 : parseFloat(e.target.value);
+                        handleInputChange("percentualCredito", Math.max(0, Math.min(95, value || 95)));
                       }}
                     />
                   </div>
@@ -260,10 +252,8 @@ export function ConfigurationsModal({ formData, onDataChange, trigger }: Configu
                       max="100"
                       value={localData.percentualHonorarios}
                       onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (!isNaN(value) && value >= 0 && value <= 100) {
-                          handleInputChange("percentualHonorarios", value);
-                        }
+                        const value = e.target.value === "" ? 70 : parseFloat(e.target.value);
+                        handleInputChange("percentualHonorarios", Math.max(0, Math.min(100, value || 70)));
                       }}
                     />
                   </div>

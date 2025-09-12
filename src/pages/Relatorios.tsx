@@ -90,7 +90,7 @@ const Relatorios = () => {
       console.error("Erro ao gerar relatório:", error);
       toast({
         title: "Erro na geração",
-        description: "Falha ao gerar relatório com IA. Verifique a configuração.",
+        description: error instanceof Error ? error.message : "Falha ao gerar relatório com IA. Verifique a configuração.",
         variant: "destructive",
       });
     } finally {
@@ -135,7 +135,7 @@ const Relatorios = () => {
       console.error("Erro ao gerar relatório personalizado:", error);
       toast({
         title: "Erro na geração",
-        description: "Falha ao gerar relatório personalizado. Verifique a configuração.",
+        description: error instanceof Error ? error.message : "Falha ao gerar relatório personalizado. Verifique a configuração.",
         variant: "destructive",
       });
     } finally {

@@ -52,6 +52,17 @@ export class IAService {
     return this.config;
   }
 
+  public async testarConexaoBasico(): Promise<void> {
+    if (!this.config || !this.config.habilitado || !this.config.apiKey) {
+      throw new Error("IA não configurada ou habilitada");
+    }
+    // Realiza uma chamada simples para validar credenciais/modelo
+    const resposta = await this.chamarIA("Responda exatamente: ok");
+    if (!resposta || !resposta.toLowerCase().includes('ok')) {
+      throw new Error("Conexão estabelecida, mas a resposta não foi válida. Verifique o modelo escolhido.");
+    }
+  }
+
   private async chamarIA(prompt: string): Promise<string> {
     if (!this.config || !this.config.habilitado || !this.config.apiKey) {
       throw new Error("IA não configurada ou habilitada");

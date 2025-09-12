@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { Settings, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { iaService } from "@/services/iaService";
 
 interface ConfiguracoesIAProps {
   onConfigSaved: (config: IAConfig) => void;
@@ -32,7 +33,7 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
     habilitado: false,
     provider: "google",
     apiKey: "",
-    modelo: "gemini-2.0-flash-exp",
+    modelo: "gemini-2.5-flash",
     temperatura: 0.7,
     promptSistema: "Você é um especialista em análise financeira brasileira. Analise os dados e forneça insights sobre tendências e oportunidades de otimização tributária."
   });
@@ -53,6 +54,7 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
       { value: "claude-3-5-haiku-20241022", label: "Claude-3.5 Haiku" }
     ],
     google: [
+      { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash (Gratuito)" },
       { value: "gemini-2.0-flash-exp", label: "Gemini 2.0 Flash Experimental (Gratuito)" },
       { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash (Gratuito)" },
       { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
@@ -91,17 +93,18 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
     setTestando(true);
     
     try {
-      // Simula teste de conexão
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Salva config atual e realiza teste real
+      iaService.setConfig(config);
+      await iaService.testarConexaoBasico();
       
       toast({
         title: "Teste realizado",
-        description: "Conexão com IA estabelecida com sucesso",
+        description: `Conexão com ${config.provider.toUpperCase()} (${config.modelo}) estabelecida com sucesso`,
       });
     } catch (error) {
       toast({
         title: "Erro no teste",
-        description: "Falha ao conectar com o provider de IA",
+        description: error instanceof Error ? error.message : "Falha ao conectar com o provider de IA",
         variant: "destructive",
       });
     } finally {
@@ -287,6 +290,7 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
                 </CardHeader>
                 <CardContent className="pt-0 space-y-1 text-sm text-muted-foreground">
                   <p><strong>🔥 Melhor custo-benefício:</strong></p>
+                  <p>• Gemini 2.5 Flash (Gratuito)</p>
                   <p>• Gemini 2.0 Flash Experimental (Gratuito)</p>
                   <p>• GPT-4o Mini (Gratuito OpenAI)</p>
                   <p>• Claude 3 Haiku (Mais barato Anthropic)</p>

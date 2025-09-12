@@ -35,7 +35,7 @@ const ConfiguracoesIA = ({ onConfigSaved, currentConfig }: ConfiguracoesIAProps)
     apiKey: "",
     modelo: "gemini-2.5-flash",
     temperatura: 0.7,
-    promptSistema: "Você é um especialista em vendas e análise de economia tributária brasileira. Sua missão é mostrar de forma persuasiva o potencial de economia que a empresa pode alcançar com os créditos federais. Foque nos benefícios financeiros, ROI e impacto positivo no negócio. Seja direto, motivador e enfatize as oportunidades de crescimento através da economia tributária."
+    promptSistema: "Você é um especialista em vendas e análise de economia tributária brasileira. Sua missão é mostrar de forma persuasiva o potencial de economia que a empresa pode alcançar com os serviços da Unique Assessoria Empresarial. Foque nos benefícios financeiros, ROI e impacto positivo no negócio. Seja direto, motivador e enfatize as oportunidades de crescimento através da economia tributária."
   });
   const [modeloCustomizado, setModeloCustomizado] = useState("");
   

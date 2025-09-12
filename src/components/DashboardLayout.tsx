@@ -40,7 +40,7 @@ const DashboardLayout = ({ children, formData, onDataChange }: DashboardLayoutPr
                   Dashboard de Economia Tributária
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Unique - Créditos Federais
+                  Unique Assessoria Empresarial
                 </p>
               </div>
             </div>

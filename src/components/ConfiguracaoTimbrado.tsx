@@ -127,7 +127,7 @@ const ConfiguracaoTimbrado = ({ onConfigSaved }: ConfiguracaoTimbradoProps) => {
 
   const currentConfig = timbradoService.getConfiguracao();
   const hasCustomLogo = !!currentConfig.logo;
-  const hasCustomData = currentConfig.razaoSocial !== "Unique Créditos Tributários LTDA";
+  const hasCustomData = currentConfig.razaoSocial !== "Unique Assessoria Empresarial";
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

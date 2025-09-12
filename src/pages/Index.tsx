@@ -154,7 +154,7 @@ const Index = () => {
               <div className="font-semibold text-warning">1. Crédito Utilizado</div>
               <p className="text-muted-foreground">
                 {formData.percentualCredito}% do valor mensal ({formatCurrency(results.valorCredito)}) 
-                é compensado com créditos federais.
+                é compensado com serviços tributários especializados.
               </p>
             </div>
             <div className="space-y-2">

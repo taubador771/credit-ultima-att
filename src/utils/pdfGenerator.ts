@@ -354,7 +354,7 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
     pdf.rect(margin + 90, yPosition, 80, 35, 'F');
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(10);
-    pdf.text('COM UNIQUE CRÉDITOS', margin + 130, yPosition + 10, { align: 'center' });
+    pdf.text('COM UNIQUE ASSESSORIA', margin + 130, yPosition + 10, { align: 'center' });
     pdf.setFontSize(14);
     pdf.setFont(undefined, 'bold');
     const novoValor = pagamentoDireto + honorarios;
@@ -394,7 +394,7 @@ export const gerarPDF = async (relatorio: RelatorioIA, formData: FormData, tipoR
       `• Economia garantida de R$ ${economiaMensal.toLocaleString('pt-BR')} por mês`,
       `• ROI de ${((economiaTotal * 12 / formData.periodo / honorarios) * 100).toFixed(0)}% ao ano`,
       '• Processo 100% legal e seguro',
-      '• Equipe especializada em créditos federais',
+      '• Equipe especializada em economia tributária',
       `• Em ${formData.periodo} meses você economiza R$ ${economiaTotal.toLocaleString('pt-BR')}`,
       '• Sem riscos operacionais para sua empresa'
     ];

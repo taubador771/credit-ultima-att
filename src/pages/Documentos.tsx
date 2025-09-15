@@ -207,6 +207,7 @@ const Documentos = () => {
                   const file = e.target.files?.[0];
                   if (file) {
                     handleUpload(file, 'modelo');
+                    e.target.value = ''; // Reset input
                   }
                 }}
                 className="hidden"
@@ -328,6 +329,7 @@ const Documentos = () => {
                   const file = e.target.files?.[0];
                   if (file) {
                     handleUpload(file, 'contrato');
+                    e.target.value = ''; // Reset input
                   }
                 }}
                 className="hidden"

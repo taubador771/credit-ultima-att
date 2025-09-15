@@ -37,9 +37,15 @@ class DocumentosService {
 
   async processarDocumentoUpload(file: File, categoria: DocumentoUpload['categoria']): Promise<DocumentoUpload> {
     // Validar tipo do arquivo
-    const tiposPermitidos = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const tiposPermitidos = [
+      'application/pdf', 
+      'application/msword', 
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    ];
     if (!tiposPermitidos.includes(file.type)) {
-      throw new Error('Tipo de arquivo não suportado. Use PDF, DOC ou DOCX.');
+      throw new Error('Tipo de arquivo não suportado. Use PDF, DOC, DOCX, PPT ou PPTX.');
     }
 
     // Validar tamanho (máximo 10MB)

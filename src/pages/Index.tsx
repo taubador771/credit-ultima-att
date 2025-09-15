@@ -143,37 +143,6 @@ const Index = () => {
 
         {/* Gráficos */}
         <ChartsSection results={results} />
-
-        {/* Informações adicionais */}
-        <div className="bg-warning-light border border-warning/20 p-6 rounded-xl">
-          <h3 className="font-bold text-warning text-lg mb-4 flex items-center gap-2">
-            💡 Como Funciona a Economia
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="space-y-2">
-              <div className="font-semibold text-warning">1. Crédito Utilizado</div>
-              <p className="text-muted-foreground">
-                {formData.percentualCredito}% do valor mensal ({formatCurrency(results.valorCredito)}) 
-                é compensado com serviços tributários especializados.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <div className="font-semibold text-warning">2. Honorários</div>
-              <p className="text-muted-foreground">
-                {formData.percentualHonorarios}% sobre o crédito utilizado 
-                ({formatCurrency(results.honorarios)}) como taxa de serviço.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <div className="font-semibold text-warning">3. Pagamento Direto</div>
-              <p className="text-muted-foreground">
-                Apenas {100 - formData.percentualCredito}% 
-                ({formatCurrency(results.valorMensal * (1 - formData.percentualCredito / 100))}) 
-                é pago diretamente ao governo.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </DashboardLayout>
   );

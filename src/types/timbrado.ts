@@ -44,8 +44,8 @@ export const configuracaoTimbradoPadrao: ConfiguracaoTimbrado = {
   },
   contato: {
     telefone: "(11) 9999-9999",
-    email: "contato@uniqueassessoria.com.br",
-    website: "www.uniqueassessoria.com.br",
+    email: "contato@uniqueassessoria.com",
+    website: "www.uniqueassessoria.com",
   },
   tema: {
     corPrimaria: "#3b82f6",

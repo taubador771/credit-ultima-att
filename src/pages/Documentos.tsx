@@ -70,43 +70,43 @@ const Documentos = () => {
   const linksEmpresa = [
     {
       title: "Site Institucional",
-      description: "www.uniqueassessoria.com.br",
+      description: "www.uniqueassessoria.com",
       icon: Globe,
-      url: "https://www.uniqueassessoria.com.br"
+      url: "https://www.uniqueassessoria.com"
     },
     {
       title: "Central de Contatos",
       description: "Contatos e informações de atendimento",
       icon: ExternalLink,
-      url: "https://portal.uniqueassessoria.com.br"
+      url: "https://portal.uniqueassessoria.com"
     },
     {
       title: "Assinatura Digital",
       description: "Sistema de assinatura eletrônica",
       icon: Download,
-      url: "https://downloads.uniqueassessoria.com.br"
+      url: "https://downloads.uniqueassessoria.com"
     }
   ];
 
   const emailsEmpresa = [
     {
       departamento: "Comercial",
-      email: "comercial@uniqueassessoria.com.br",
+      email: "comercial@uniqueassessoria.com",
       responsavel: "Equipe de Vendas"
     },
     {
       departamento: "Técnico",
-      email: "tecnico@uniqueassessoria.com.br",
+      email: "contabil@uniqueassessoria.com",
       responsavel: "Consultores Tributários"
     },
     {
       departamento: "Suporte",
-      email: "suporte@uniqueassessoria.com.br",
+      email: "assistente@uniqueassessoria.com",
       responsavel: "Atendimento ao Cliente"
     },
     {
       departamento: "Diretoria",
-      email: "diretoria@uniqueassessoria.com.br",
+      email: "diretoria@uniqueassessoria.com",
       responsavel: "Direção Executiva"
     }
   ];

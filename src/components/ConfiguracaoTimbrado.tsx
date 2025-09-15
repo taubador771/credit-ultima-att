@@ -347,7 +347,7 @@ const ConfiguracaoTimbrado = ({ onConfigSaved }: ConfiguracaoTimbradoProps) => {
                     onChange={(e) => updateConfig({ 
                       contato: { ...config.contato, website: e.target.value }
                     })}
-                    placeholder="www.empresa.com.br"
+                    placeholder="www.empresa.com"
                   />
                 </div>
               </div>

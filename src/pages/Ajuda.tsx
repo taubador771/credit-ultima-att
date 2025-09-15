@@ -176,10 +176,10 @@ const Ajuda = () => {
                     title: "Email de contato", 
                     description: "E-mail copiado para área de transferência",
                   });
-                  navigator.clipboard.writeText("suporte@unique.com.br");
+                  navigator.clipboard.writeText("assistente@uniqueassessoria.com");
                 }}>
                   <Mail className="h-4 w-4 mr-2" />
-                  suporte@unique.com.br
+                  assistente@uniqueassessoria.com
                 </Button>
                 <Button className="w-full" onClick={() => {
                   toast({

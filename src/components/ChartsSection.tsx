@@ -93,10 +93,10 @@ const ChartsSection = ({ results }: ChartsSectionProps) => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <BarChart data={barData} margin={{ top: 20, right: 50, left: 80, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis dataKey="name" />
-                <YAxis tickFormatter={formatCurrency} />
+                <YAxis tickFormatter={formatCurrency} width={70} />
                 <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                 <Legend />
                 <Bar dataKey="Sem Unique" fill="#ef4444" radius={[4, 4, 0, 0]} />
@@ -118,23 +118,30 @@ const ChartsSection = ({ results }: ChartsSectionProps) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
-              <PieChart>
+            <ResponsiveContainer width="100%" height={400}>
+              <PieChart margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
                 <Pie
                   data={pieData}
                   cx="50%"
-                  cy="50%"
-                  outerRadius={120}
+                  cy="45%"
+                  outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, percent }) => `${name}: ${formatPercent(percent)}`}
-                  labelLine={false}
+                  label={false}
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                <Tooltip 
+                  formatter={(value) => formatCurrency(Number(value))}
+                  labelFormatter={(label) => label}
+                />
+                <Legend 
+                  verticalAlign="bottom" 
+                  height={36}
+                  formatter={(value, entry) => `${value}: ${formatPercent(entry.payload.value / results.valorMensal)}`}
+                />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -154,10 +161,16 @@ const ChartsSection = ({ results }: ChartsSectionProps) => {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={timelineData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <LineChart data={timelineData} margin={{ top: 20, right: 50, left: 80, bottom: 40 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis dataKey="mes" label={{ value: 'Mês', position: 'insideBottom', offset: -10 }} />
-              <YAxis tickFormatter={formatCurrency} />
+              <XAxis 
+                dataKey="mes" 
+                label={{ value: 'Mês', position: 'insideBottom', offset: -10 }}
+              />
+              <YAxis 
+                tickFormatter={formatCurrency} 
+                width={70}
+              />
               <Tooltip 
                 formatter={(value) => [formatCurrency(Number(value)), 'Economia Acumulada']}
                 labelFormatter={(label) => `Mês ${label}`}

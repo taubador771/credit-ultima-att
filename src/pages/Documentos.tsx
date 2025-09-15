@@ -193,287 +193,243 @@ const Documentos = () => {
 
         {/* Modelos de Apresentação */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-              <Presentation className="h-6 w-6 text-primary" />
-              Modelos de Apresentação
-            </h2>
-            <div className="flex gap-2">
-              <input
-                ref={fileInputRefApresentacao}
-                type="file"
-                accept=".pdf,.doc,.docx,.ppt,.pptx"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    handleUpload(file, 'modelo');
-                    e.target.value = ''; // Reset input
-                  }
-                }}
-                className="hidden"
-              />
-               <Button
-                onClick={() => fileInputRefApresentacao.current?.click()}
-                size="sm"
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                📁 Fazer Upload
-              </Button>
-            </div>
-          </div>
+          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+            <Presentation className="h-6 w-6 text-primary" />
+            Modelos de Apresentação
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Modelos padrão */}
-            {modelosApresentacao.map((modelo, index) => (
-              <Card key={`default-${index}`} className="hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-2 rounded-lg">
-                      <modelo.icon className="h-5 w-5 text-primary" />
+            {modelosApresentacao.map((modelo, index) => {
+              const documentoPersonalizado = getDocumentosPorCategoria('modelo').find(doc => 
+                doc.nome.toLowerCase().includes(modelo.title.toLowerCase().split(' ')[0])
+              );
+              
+              return (
+                <Card key={`apresentacao-${index}`} className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 p-2 rounded-lg">
+                        <modelo.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{modelo.title}</CardTitle>
+                        {documentoPersonalizado && (
+                          <p className="text-xs text-green-600 font-medium">
+                            ✓ Arquivo personalizado disponível
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{modelo.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm mb-4">{modelo.description}</p>
+                    
+                    {documentoPersonalizado && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                        <p className="text-sm font-medium text-green-800">{documentoPersonalizado.nome}</p>
+                        <p className="text-xs text-green-600">
+                          {documentosService.formatarTamanhoArquivo(documentoPersonalizado.tamanho)} • 
+                          {new Date(documentoPersonalizado.dataUpload).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-2 mb-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          if (documentoPersonalizado) {
+                            handleDownload(documentoPersonalizado.id);
+                          } else {
+                            toast({
+                              title: "Visualizando modelo",
+                              description: modelo.title,
+                            });
+                          }
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Visualizar
+                      </Button>
+                      <Button 
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          if (documentoPersonalizado) {
+                            handleDownload(documentoPersonalizado.id);
+                          } else {
+                            toast({
+                              title: "Download iniciado",
+                              description: `Baixando ${modelo.arquivo}`,
+                            });
+                          }
+                        }}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm mb-4">{modelo.description}</p>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        toast({
-                          title: "Visualizando modelo",
-                          description: modelo.title,
-                        });
-                      }}
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Visualizar
-                    </Button>
-                    <Button 
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        toast({
-                          title: "Download iniciado",
-                          description: `Baixando ${modelo.arquivo}`,
-                        });
-                      }}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {/* Documentos enviados por upload */}
-            {getDocumentosPorCategoria('modelo').map((documento) => (
-              <Card key={documento.id} className="hover:shadow-md transition-shadow border-primary/20">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-green-100 p-2 rounded-lg">
-                      <FileText className="h-5 w-5 text-green-600" />
+                    
+                    <div className="flex gap-2">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.ppt,.pptx"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleUpload(file, 'modelo');
+                            e.target.value = '';
+                          }
+                        }}
+                        className="hidden"
+                        id={`upload-apresentacao-${index}`}
+                      />
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => document.getElementById(`upload-apresentacao-${index}`)?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        {documentoPersonalizado ? 'Substituir' : 'Upload'}
+                      </Button>
+                      {documentoPersonalizado && (
+                        <Button 
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemover(documentoPersonalizado.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{documento.nome}</CardTitle>
-                      <p className="text-xs text-muted-foreground">
-                        {documentosService.formatarTamanhoArquivo(documento.tamanho)} • 
-                        {new Date(documento.dataUpload).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleDownload(documento.id)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                    <Button 
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleRemover(documento.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
         {/* Modelos de Contratos */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-              <ScrollText className="h-6 w-6 text-primary" />
-              Contratos e Termos
-            </h2>
-            <div className="flex gap-2">
-              <input
-                ref={fileInputRefContrato}
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    handleUpload(file, 'contrato');
-                    e.target.value = ''; // Reset input
-                  }
-                }}
-                className="hidden"
-              />
-               <Button
-                onClick={() => fileInputRefContrato.current?.click()}
-                size="sm"
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                📄 Fazer Upload
-              </Button>
-            </div>
-          </div>
+          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+            <ScrollText className="h-6 w-6 text-primary" />
+            Contratos e Termos
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Modelos padrão */}
-            {modelosContratos.map((contrato, index) => (
-              <Card key={`default-${index}`} className="hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-secondary/10 p-2 rounded-lg">
-                      <contrato.icon className="h-5 w-5 text-secondary" />
+            {modelosContratos.map((contrato, index) => {
+              const documentoPersonalizado = getDocumentosPorCategoria('contrato').find(doc => 
+                doc.nome.toLowerCase().includes(contrato.title.toLowerCase().split(' ')[0])
+              );
+              
+              return (
+                <Card key={`contrato-${index}`} className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-secondary/10 p-2 rounded-lg">
+                        <contrato.icon className="h-5 w-5 text-secondary" />
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{contrato.title}</CardTitle>
+                        {documentoPersonalizado && (
+                          <p className="text-xs text-green-600 font-medium">
+                            ✓ Arquivo personalizado disponível
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{contrato.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm mb-4">{contrato.description}</p>
+                    
+                    {documentoPersonalizado && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                        <p className="text-sm font-medium text-green-800">{documentoPersonalizado.nome}</p>
+                        <p className="text-xs text-green-600">
+                          {documentosService.formatarTamanhoArquivo(documentoPersonalizado.tamanho)} • 
+                          {new Date(documentoPersonalizado.dataUpload).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-2 mb-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          if (documentoPersonalizado) {
+                            handleDownload(documentoPersonalizado.id);
+                          } else {
+                            toast({
+                              title: "Visualizando documento",
+                              description: contrato.title,
+                            });
+                          }
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Visualizar
+                      </Button>
+                      <Button 
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => {
+                          if (documentoPersonalizado) {
+                            handleDownload(documentoPersonalizado.id);
+                          } else {
+                            toast({
+                              title: "Download iniciado",
+                              description: `Baixando ${contrato.arquivo}`,
+                            });
+                          }
+                        }}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm mb-4">{contrato.description}</p>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        toast({
-                          title: "Visualizando documento",
-                          description: contrato.title,
-                        });
-                      }}
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Visualizar
-                    </Button>
-                    <Button 
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        toast({
-                          title: "Download iniciado",
-                          description: `Baixando ${contrato.arquivo}`,
-                        });
-                      }}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {/* Documentos enviados por upload - Contratos */}
-            {getDocumentosPorCategoria('contrato').map((documento) => (
-              <Card key={documento.id} className="hover:shadow-md transition-shadow border-secondary/20">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 p-2 rounded-lg">
-                      <ScrollText className="h-5 w-5 text-blue-600" />
+                    
+                    <div className="flex gap-2">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleUpload(file, 'contrato');
+                            e.target.value = '';
+                          }
+                        }}
+                        className="hidden"
+                        id={`upload-contrato-${index}`}
+                      />
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => document.getElementById(`upload-contrato-${index}`)?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        {documentoPersonalizado ? 'Substituir' : 'Upload'}
+                      </Button>
+                      {documentoPersonalizado && (
+                        <Button 
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemover(documentoPersonalizado.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{documento.nome}</CardTitle>
-                      <p className="text-xs text-muted-foreground">
-                        {documentosService.formatarTamanhoArquivo(documento.tamanho)} • 
-                        {new Date(documento.dataUpload).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleDownload(documento.id)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                    <Button 
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleRemover(documento.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-
-            {/* Documentos enviados por upload - Termos */}
-            {getDocumentosPorCategoria('termo').map((documento) => (
-              <Card key={documento.id} className="hover:shadow-md transition-shadow border-accent/20">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-purple-100 p-2 rounded-lg">
-                      <FileText className="h-5 w-5 text-purple-600" />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{documento.nome}</CardTitle>
-                      <p className="text-xs text-muted-foreground">
-                        {documentosService.formatarTamanhoArquivo(documento.tamanho)} • 
-                        {new Date(documento.dataUpload).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleDownload(documento.id)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                    <Button 
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleRemover(documento.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 

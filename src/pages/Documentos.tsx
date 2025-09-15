@@ -1,9 +1,11 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Eye, Plus, Presentation, ScrollText, ExternalLink, Mail, Globe, Users } from "lucide-react";
+import { FileText, Download, Eye, Plus, Presentation, ScrollText, ExternalLink, Mail, Globe, Users, Upload, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { documentosService } from "@/services/documentosService";
+import { DocumentoUpload } from "@/types/documentos";
 
 interface FormData {
   nomeEmpresa: string;
@@ -24,6 +26,71 @@ const Documentos = () => {
     percentualCredito: 95,
     percentualHonorarios: 70,
   });
+
+  const [documentosUpload, setDocumentosUpload] = useState<DocumentoUpload[]>([]);
+  const fileInputRefApresentacao = useRef<HTMLInputElement>(null);
+  const fileInputRefContrato = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const config = documentosService.obterDocumentos();
+    setDocumentosUpload(config.documentosDisponiveis);
+  }, []);
+
+  const handleUpload = async (file: File, categoria: DocumentoUpload['categoria']) => {
+    try {
+      await documentosService.adicionarDocumento(file, categoria);
+      const config = documentosService.obterDocumentos();
+      setDocumentosUpload(config.documentosDisponiveis);
+      toast({
+        title: "Upload realizado com sucesso",
+        description: `${file.name} foi adicionado`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro no upload",
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemover = (id: string) => {
+    try {
+      documentosService.removerDocumento(id);
+      const config = documentosService.obterDocumentos();
+      setDocumentosUpload(config.documentosDisponiveis);
+      toast({
+        title: "Documento removido",
+        description: "Documento excluído com sucesso",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao remover",
+        description: "Não foi possível remover o documento",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownload = (id: string) => {
+    try {
+      documentosService.baixarDocumento(id);
+      toast({
+        title: "Download iniciado",
+        description: "O arquivo está sendo baixado",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro no download",
+        description: "Não foi possível baixar o documento",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getDocumentosPorCategoria = (categoria: DocumentoUpload['categoria']) => {
+    return documentosUpload.filter(doc => doc.categoria === categoria);
+  };
 
   const modelosApresentacao = [
     {
@@ -126,13 +193,38 @@ const Documentos = () => {
 
         {/* Modelos de Apresentação */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-            <Presentation className="h-6 w-6 text-primary" />
-            Modelos de Apresentação
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+              <Presentation className="h-6 w-6 text-primary" />
+              Modelos de Apresentação
+            </h2>
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRefApresentacao}
+                type="file"
+                accept=".pdf,.doc,.docx,.ppt,.pptx"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleUpload(file, 'modelo');
+                  }
+                }}
+                className="hidden"
+              />
+              <Button
+                onClick={() => fileInputRefApresentacao.current?.click()}
+                size="sm"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Fazer Upload
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Modelos padrão */}
             {modelosApresentacao.map((modelo, index) => (
-              <Card key={index} className="hover:shadow-md transition-shadow">
+              <Card key={`default-${index}`} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/10 p-2 rounded-lg">
@@ -177,18 +269,83 @@ const Documentos = () => {
                 </CardContent>
               </Card>
             ))}
+
+            {/* Documentos enviados por upload */}
+            {getDocumentosPorCategoria('modelo').map((documento) => (
+              <Card key={documento.id} className="hover:shadow-md transition-shadow border-primary/20">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-green-100 p-2 rounded-lg">
+                      <FileText className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{documento.nome}</CardTitle>
+                      <p className="text-xs text-muted-foreground">
+                        {documentosService.formatarTamanhoArquivo(documento.tamanho)} • 
+                        {new Date(documento.dataUpload).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleDownload(documento.id)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                    <Button 
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemover(documento.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
 
         {/* Modelos de Contratos */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-            <ScrollText className="h-6 w-6 text-primary" />
-            Contratos e Termos
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+              <ScrollText className="h-6 w-6 text-primary" />
+              Contratos e Termos
+            </h2>
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRefContrato}
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleUpload(file, 'contrato');
+                  }
+                }}
+                className="hidden"
+              />
+              <Button
+                onClick={() => fileInputRefContrato.current?.click()}
+                size="sm"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Fazer Upload
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Modelos padrão */}
             {modelosContratos.map((contrato, index) => (
-              <Card key={index} className="hover:shadow-md transition-shadow">
+              <Card key={`default-${index}`} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-3">
                     <div className="bg-secondary/10 p-2 rounded-lg">
@@ -228,6 +385,86 @@ const Documentos = () => {
                     >
                       <Download className="h-4 w-4 mr-2" />
                       Download
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Documentos enviados por upload - Contratos */}
+            {getDocumentosPorCategoria('contrato').map((documento) => (
+              <Card key={documento.id} className="hover:shadow-md transition-shadow border-secondary/20">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-100 p-2 rounded-lg">
+                      <ScrollText className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{documento.nome}</CardTitle>
+                      <p className="text-xs text-muted-foreground">
+                        {documentosService.formatarTamanhoArquivo(documento.tamanho)} • 
+                        {new Date(documento.dataUpload).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleDownload(documento.id)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                    <Button 
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemover(documento.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Documentos enviados por upload - Termos */}
+            {getDocumentosPorCategoria('termo').map((documento) => (
+              <Card key={documento.id} className="hover:shadow-md transition-shadow border-accent/20">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-purple-100 p-2 rounded-lg">
+                      <FileText className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{documento.nome}</CardTitle>
+                      <p className="text-xs text-muted-foreground">
+                        {documentosService.formatarTamanhoArquivo(documento.tamanho)} • 
+                        {new Date(documento.dataUpload).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleDownload(documento.id)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                    <Button 
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemover(documento.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>

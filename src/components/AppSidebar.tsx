@@ -11,6 +11,7 @@ import {
   useSidebar 
 } from "@/components/ui/sidebar";
 import { ConfigurationsModal } from "@/components/ConfigurationsModal";
+import { EmpresaForm } from "@/components/EmpresaForm";
 import { NavLink, useLocation } from "react-router-dom";
 import { 
   Home,
@@ -19,7 +20,8 @@ import {
   Settings, 
   Calculator,
   TrendingUp,
-  HelpCircle
+  HelpCircle,
+  Building2
 } from "lucide-react";
 
 interface FormData {
@@ -89,6 +91,17 @@ export function AppSidebar({ formData, onDataChange }: AppSidebarProps) {
       </SidebarHeader>
 
       <SidebarContent className="p-4">
+        {/* Dados da Empresa - Seção Principal */}
+        {open && (
+          <div className="mb-6">
+            <EmpresaForm 
+              formData={formData} 
+              onDataChange={onDataChange}
+              compact={true}
+            />
+          </div>
+        )}
+
         {/* Menu Principal */}
         <SidebarGroup>
           <SidebarGroupLabel className="flex items-center gap-2 text-base font-semibold mb-3">
@@ -142,8 +155,8 @@ export function AppSidebar({ formData, onDataChange }: AppSidebarProps) {
                       <Settings className="h-4 w-4" />
                       {open && (
                         <div className="flex flex-col items-start">
-                          <span>Simulador</span>
-                          <span className="text-xs text-muted-foreground">Parâmetros de cálculo</span>
+                          <span>Configurações Avançadas</span>
+                          <span className="text-xs text-muted-foreground">IA, Visual, Sistema</span>
                         </div>
                       )}
                     </SidebarMenuButton>
@@ -178,30 +191,35 @@ export function AppSidebar({ formData, onDataChange }: AppSidebarProps) {
         </SidebarGroup>
 
         {/* Status da Configuração */}
-        {open && formData.nomeEmpresa && (
-          <div className="mt-6 p-3 bg-success-light border border-success/20 rounded-lg">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-2 h-2 bg-success rounded-full"></div>
-              <span className="text-sm font-medium text-success">Configurado</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {formData.nomeEmpresa}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {formData.tributos.length} tributos selecionados
-            </p>
-          </div>
-        )}
-
-        {open && !formData.nomeEmpresa && (
-          <div className="mt-6 p-3 bg-warning-light border border-warning/20 rounded-lg">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-2 h-2 bg-warning rounded-full"></div>
-              <span className="text-sm font-medium text-warning">Pendente</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Configure os dados para começar
-            </p>
+        {open && (
+          <div className="mt-6">
+            {formData.nomeEmpresa ? (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm font-medium text-green-700">Empresa Configurada</span>
+                </div>
+                <p className="text-xs text-green-600 font-medium">
+                  {formData.nomeEmpresa}
+                </p>
+                <p className="text-xs text-green-600">
+                  {formData.tributos.length} tributos • {formData.periodo} meses
+                </p>
+                <p className="text-xs text-green-600">
+                  R$ {formData.valorMensal.toLocaleString('pt-BR')} mensais
+                </p>
+              </div>
+            ) : (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium text-amber-700">Configuração Pendente</span>
+                </div>
+                <p className="text-xs text-amber-600">
+                  Configure os dados da empresa acima para começar
+                </p>
+              </div>
+            )}
           </div>
         )}
       </SidebarContent>

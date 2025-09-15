@@ -212,12 +212,13 @@ const Documentos = () => {
                 }}
                 className="hidden"
               />
-              <Button
+               <Button
                 onClick={() => fileInputRefApresentacao.current?.click()}
                 size="sm"
+                className="bg-primary hover:bg-primary/90"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Fazer Upload
+                📁 Fazer Upload
               </Button>
             </div>
           </div>
@@ -334,12 +335,13 @@ const Documentos = () => {
                 }}
                 className="hidden"
               />
-              <Button
+               <Button
                 onClick={() => fileInputRefContrato.current?.click()}
                 size="sm"
+                className="bg-primary hover:bg-primary/90"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Fazer Upload
+                📄 Fazer Upload
               </Button>
             </div>
           </div>
